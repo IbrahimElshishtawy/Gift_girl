@@ -35,16 +35,16 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
-  DATABASE_URL: string;
+  DATABASE_URL!: string;
 
   @IsString()
   @IsNotEmpty()
-  REDIS_HOST: string;
+  REDIS_HOST!: string;
 
   @IsInt()
   @Min(1)
   @Max(65535)
-  REDIS_PORT: number;
+  REDIS_PORT!: number;
 
   @IsString()
   @IsOptional()

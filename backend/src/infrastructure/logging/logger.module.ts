@@ -26,8 +26,8 @@ import { IncomingMessage } from 'http';
                   },
                 }
               : undefined,
-            customProps: (req: IncomingMessage & { id?: string; correlationId?: string }) => ({
-              requestId: req.id || req.correlationId || 'N/A',
+            customProps: (req: IncomingMessage & { id?: unknown; correlationId?: string }) => ({
+              requestId: String(req.id || req.correlationId || 'N/A'),
             }),
             redact: {
               paths: [

@@ -58,7 +58,7 @@ describe('HealthController (e2e)', () => {
   });
 
   it('/api/health (GET) should return 503 Service Unavailable when Redis is unhealthy', async () => {
-    redisService.isHealthy!.mockResolvedValueOnce(false);
+    (redisService.isHealthy as jest.Mock).mockResolvedValueOnce(false);
 
     const response = await request(app.getHttpServer()).get('/api/health').expect(503);
 
