@@ -1,4 +1,4 @@
-// Prisma Schema for Gift Girl Marketplace Infrastructure
+// Prisma Schema for Gift Girl Marketplace Infrastructure & Auth
 
 generator client {
   provider = "prisma-client-js"
@@ -17,4 +17,135 @@ model SystemHealth {
   createdAt DateTime @default(now())
 
   @@map("system_health")
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING_VERIFICATION
+  SUSPENDED
+  LOCKED
+  DISABLED
+}
+
+enum UserRole {
+  CUSTOMER
+  SELLER
+  SELLER_STAFF
+  DELIVERY_AGENT
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum VerificationType {
+  EMAIL_VERIFICATION
+  PHONE_VERIFICATION
+}
+
+enum SecurityEventType {
+  REGISTER
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+  LOGOUT_ALL
+  PASSWORD_CHANGE
+  PASSWORD_RESET_REQUEST
+  PASSWORD_RESET_COMPLETE
+  TOKEN_REUSE_DETECTED
+  ACCOUNT_LOCKED
+  VERIFICATION_SUCCESS
+  VERIFICATION_FAILED
+}
+
+model User {
+  id                  String               @id @default(uuid())
+  email               String?              @unique
+  phone               String?              @unique
+  passwordHash        String
+  status              UserStatus           @default(PENDING_VERIFICATION)
+  emailVerified       Boolean              @default(false)
+  phoneVerified       Boolean              @default(false)
+  role                UserRole             @default(CUSTOMER)
+  failedLoginAttempts Int                  @default(0)
+  lockoutUntil        DateTime?
+  lastLoginAt         DateTime?
+  lastLoginIp         String?
+  deletedAt           DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  sessions            AuthSession[]
+  passwordResetTokens PasswordResetToken[]
+  verificationTokens  VerificationToken[]
+  securityAuditEvents SecurityAuditEvent[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([status])
+  @@map("users")
+}
+
+model AuthSession {
+  id               String    @id @default(uuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokenHash String
+  familyId         String
+  deviceInfo       String?
+  ipAddress        String?
+  userAgent        String?
+  isRevoked        Boolean   @default(false)
+  revokedAt        DateTime?
+  revokeReason     String?
+  expiresAt        DateTime
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([familyId])
+  @@index([refreshTokenHash])
+  @@map("auth_sessions")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("password_reset_tokens")
+}
+
+model VerificationToken {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String
+  type      VerificationType
+  expiresAt DateTime
+  isUsed    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("verification_tokens")
+}
+
+model SecurityAuditEvent {
+  id        String            @id @default(uuid())
+  userId    String?
+  user      User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  event     SecurityEventType
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime          @default(now())
+
+  @@index([userId])
+  @@index([event])
+  @@map("security_audit_events")
 }

@@ -66,6 +66,53 @@ export class EnvironmentVariables {
   @IsString()
   @IsOptional()
   SWAGGER_ENABLED: string = 'true';
+
+  // JWT & Auth Settings
+  @IsString()
+  @IsNotEmpty()
+  JWT_ACCESS_SECRET: string = 'dev_jwt_access_secret_do_not_use_in_production_123456789';
+
+  @IsString()
+  @IsOptional()
+  JWT_ACCESS_EXPIRES_IN: string = '15m';
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_REFRESH_SECRET: string = 'dev_jwt_refresh_secret_do_not_use_in_production_987654321';
+
+  @IsString()
+  @IsOptional()
+  JWT_REFRESH_EXPIRES_IN: string = '7d';
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  AUTH_RATE_LIMIT_WINDOW_SECONDS: number = 60;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  AUTH_RATE_LIMIT_LOGIN_MAX: number = 5;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  MAX_LOGIN_ATTEMPTS: number = 5;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  LOCKOUT_DURATION_MINUTES: number = 15;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  VERIFICATION_EXPIRATION_HOURS: number = 24;
+
+  @IsInt()
+  @Min(1)
+  @IsOptional()
+  PASSWORD_RESET_EXPIRATION_MINUTES: number = 30;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

@@ -6,13 +6,22 @@ import redisConfig from './redis.config';
 import securityConfig from './security.config';
 import loggingConfig from './logging.config';
 import queueConfig from './queue.config';
+import authConfig from './auth.config';
 import { validateEnv } from './env.validation';
 
 @Module({
   imports: [
     NestConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, redisConfig, securityConfig, loggingConfig, queueConfig],
+      load: [
+        appConfig,
+        databaseConfig,
+        redisConfig,
+        securityConfig,
+        loggingConfig,
+        queueConfig,
+        authConfig,
+      ],
       validate: validateEnv,
       envFilePath: ['.env.local', '.env'],
     }),
