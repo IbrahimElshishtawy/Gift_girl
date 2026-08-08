@@ -21,7 +21,7 @@ export default registerAs('auth', (): AuthConfig => ({
     process.env.JWT_REFRESH_SECRET || 'dev_jwt_refresh_secret_do_not_use_in_production_987654321',
   jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   rateLimitWindowSeconds: parseInt(process.env.AUTH_RATE_LIMIT_WINDOW_SECONDS || '60', 10),
-  rateLimitLoginMax: parseInt(process.env.AUTH_RATE_LIMIT_LOGIN_MAX || '5', 10),
+  rateLimitLoginMax: parseInt(process.env.AUTH_RATE_LIMIT_LOGIN_MAX || '10', 10),
   maxLoginAttempts: parseInt(process.env.MAX_LOGIN_ATTEMPTS || '5', 10),
   lockoutDurationMinutes: parseInt(process.env.LOCKOUT_DURATION_MINUTES || '15', 10),
   verificationExpirationHours: parseInt(process.env.VERIFICATION_EXPIRATION_HOURS || '24', 10),

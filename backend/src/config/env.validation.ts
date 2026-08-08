@@ -92,7 +92,7 @@ export class EnvironmentVariables {
   @IsInt()
   @Min(1)
   @IsOptional()
-  AUTH_RATE_LIMIT_LOGIN_MAX: number = 5;
+  AUTH_RATE_LIMIT_LOGIN_MAX: number = 10;
 
   @IsInt()
   @Min(1)

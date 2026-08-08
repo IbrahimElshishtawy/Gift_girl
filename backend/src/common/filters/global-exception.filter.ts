@@ -29,6 +29,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
+      errorCode = HttpStatus[status] || 'HTTP_ERROR';
       const exceptionResponse = exception.getResponse();
 
       if (typeof exceptionResponse === 'string') {
@@ -44,8 +45,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
         if (respObj.error && typeof respObj.error === 'string') {
           errorCode = respObj.error.toUpperCase().replace(/\s+/g, '_');
-        } else {
-          errorCode = HttpStatus[status] || 'HTTP_ERROR';
         }
       }
     } else if (exception instanceof Error) {
