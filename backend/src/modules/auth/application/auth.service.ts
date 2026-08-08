@@ -2,8 +2,11 @@ import {
   Injectable,
   Logger,
   UnauthorizedException,
+  ConflictException,
   BadRequestException,
+  HttpStatus,
   Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { createHash, randomBytes } from 'crypto';
@@ -33,6 +36,7 @@ export class AuthService {
 
   constructor(
     private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
     private readonly passwordHasher: PasswordHasherService,
     private readonly jwtAuthService: JwtAuthService,

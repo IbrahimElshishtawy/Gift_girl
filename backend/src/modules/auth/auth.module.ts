@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { PasswordHasherService } from './infrastructure/password-hasher.service';
@@ -15,7 +15,7 @@ import { RolesGuard } from './presentation/guards/roles.guard';
 import { PermissionsGuard } from './presentation/guards/permissions.guard';
 
 @Module({
-  imports: [UsersModule, JwtModule.register({})],
+  imports: [forwardRef(() => UsersModule), JwtModule.register({})],
   controllers: [AuthController],
   providers: [
     PasswordHasherService,
@@ -41,6 +41,7 @@ import { PermissionsGuard } from './presentation/guards/permissions.guard';
     PasswordHasherService,
     JwtAuthService,
     SessionService,
+    SecurityAuditService,
   ],
 })
 export class AuthModule {}
