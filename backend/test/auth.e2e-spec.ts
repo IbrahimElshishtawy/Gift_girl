@@ -77,7 +77,17 @@ describe('AuthController & Security Audit (e2e)', () => {
       update: jest.fn().mockImplementation(({ where, data }) => {
         const idx = mockUsers.findIndex((u) => u.id === where.id);
         if (idx !== -1) {
-          mockUsers[idx] = { ...mockUsers[idx], ...data, updatedAt: new Date() };
+          const updated = { ...mockUsers[idx], ...data, updatedAt: new Date() };
+          if (
+            data.failedLoginAttempts &&
+            typeof data.failedLoginAttempts === 'object' &&
+            'increment' in data.failedLoginAttempts
+          ) {
+            const current = (mockUsers[idx].failedLoginAttempts as number) || 0;
+            const inc = (data.failedLoginAttempts as { increment: number }).increment;
+            updated.failedLoginAttempts = current + inc;
+          }
+          mockUsers[idx] = updated;
           return Promise.resolve(mockUsers[idx]);
         }
         return Promise.resolve(null);
@@ -559,10 +569,10 @@ describe('AuthController & Security Audit (e2e)', () => {
     const rateLimitIdentity = `ratelimit_${Date.now()}@example.com`;
 
     let hitRateLimit = false;
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 25; i++) {
       const res = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({ identity: rateLimitIdentity, password: testPassword });
+        .post('/api/auth/request-password-reset')
+        .send({ identity: rateLimitIdentity });
 
       if (res.status === 429) {
         hitRateLimit = true;

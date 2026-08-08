@@ -54,6 +54,13 @@ enum SecurityEventType {
   ACCOUNT_LOCKED
   VERIFICATION_SUCCESS
   VERIFICATION_FAILED
+  PROFILE_UPDATE
+  ADDRESS_CREATE
+  ADDRESS_UPDATE
+  ADDRESS_DELETE
+  ROLE_ASSIGNED
+  PERMISSION_ASSIGNED
+  ACCOUNT_STATUS_CHANGE
 }
 
 model User {
@@ -73,6 +80,10 @@ model User {
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
 
+  profile             UserProfile?
+  addresses           UserAddress[]
+  preference          UserPreference?
+  roleAssignments     UserRoleAssignment[]
   sessions            AuthSession[]
   passwordResetTokens PasswordResetToken[]
   verificationTokens  VerificationToken[]
@@ -82,6 +93,123 @@ model User {
   @@index([phone])
   @@index([status])
   @@map("users")
+}
+
+model UserProfile {
+  id          String    @id @default(uuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName   String?
+  lastName    String?
+  displayName String?
+  avatarUrl   String?
+  dateOfBirth DateTime?
+  gender      String?
+  locale      String    @default("en")
+  timezone    String    @default("UTC")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("user_profiles")
+}
+
+model UserAddress {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label            String   @default("Home")
+  recipientName    String
+  phone            String
+  country          String   @default("Egypt")
+  governorateState String
+  city             String
+  district         String?
+  street           String
+  building         String?
+  apartment        String?
+  floor            String?
+  postalCode       String?
+  isDefault        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, isDefault])
+  @@map("user_addresses")
+}
+
+model UserPreference {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language           String   @default("ar")
+  currency           String   @default("EGP")
+  emailNotifications Boolean  @default(true)
+  pushNotifications  Boolean  @default(true)
+  smsNotifications   Boolean  @default(true)
+  marketingConsent   Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("user_preferences")
+}
+
+model Role {
+  id                  String               @id @default(uuid())
+  code                String               @unique
+  name                String
+  description         String?
+  isSystem            Boolean              @default(false)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  rolePermissions     RolePermission[]
+  userRoleAssignments UserRoleAssignment[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id              String           @id @default(uuid())
+  code            String           @unique
+  name            String
+  description     String?
+  resource        String
+  action          String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+model UserRoleAssignment {
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_role_assignments")
 }
 
 model AuthSession {
