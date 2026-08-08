@@ -1,12 +1,17 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
+import { RbacService } from '../../../rbac/application/rbac.service';
+import { AuthenticatedUser } from '../../domain/authenticated-user.interface';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly rbacService: RbacService,
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -16,7 +21,21 @@ export class PermissionsGuard implements CanActivate {
       return true;
     }
 
-    // Permission foundation check (extensible for fine-grained policy evaluation)
+    const request = context.switchToHttp().getRequest();
+    const user = request.user as AuthenticatedUser | undefined;
+
+    if (!user || !user.id) {
+      throw new ForbiddenException('User identity missing for permission verification.');
+    }
+
+    const hasPerm = await this.rbacService.hasPermission(user.id, requiredPermissions);
+
+    if (!hasPerm) {
+      throw new ForbiddenException(
+        `You do not possess the required permissions (${requiredPermissions.join(', ')}) to access this resource.`,
+      );
+    }
+
     return true;
   }
 }
