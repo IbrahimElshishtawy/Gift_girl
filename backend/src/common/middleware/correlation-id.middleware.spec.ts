@@ -10,7 +10,9 @@ describe('CorrelationIdMiddleware', () => {
   });
 
   it('should generate a new request ID if none provided in headers', () => {
-    const req = { headers: {} } as AppRequest;
+    const req = {
+      headers: {},
+    } as unknown as AppRequest;
     const res = {
       setHeader: jest.fn(),
     } as unknown as Response;
@@ -30,7 +32,7 @@ describe('CorrelationIdMiddleware', () => {
       headers: {
         'x-request-id': customId,
       },
-    } as AppRequest;
+    } as unknown as AppRequest;
     const res = {
       setHeader: jest.fn(),
     } as unknown as Response;

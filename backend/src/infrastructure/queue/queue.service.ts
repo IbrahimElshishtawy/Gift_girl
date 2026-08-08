@@ -48,11 +48,7 @@ export class QueueFactoryService {
     return queue;
   }
 
-  createWorker(
-    name: string,
-    processor: Processor,
-    options?: Partial<WorkerOptions>,
-  ): Worker {
+  createWorker(name: string, processor: Processor, options?: Partial<WorkerOptions>): Worker {
     if (this.workers.has(name)) {
       return this.workers.get(name)!;
     }
@@ -66,10 +62,7 @@ export class QueueFactoryService {
     });
 
     worker.on('failed', (job, err) => {
-      this.logger.error(
-        `Job ${job?.id} failed in queue ${name}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Job ${job?.id} failed in queue ${name}: ${err.message}`, err.stack);
     });
 
     worker.on('error', (err) => {

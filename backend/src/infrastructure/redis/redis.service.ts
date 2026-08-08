@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  OnModuleInit,
-  OnModuleDestroy,
-  Logger,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger, Inject } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import Redis, { RedisOptions } from 'ioredis';
 import redisConfig from '../../config/redis.config';
@@ -12,9 +6,7 @@ import { IRedisService } from './redis.interface';
 import { randomUUID } from 'crypto';
 
 @Injectable()
-export class RedisService
-  implements IRedisService, OnModuleInit, OnModuleDestroy
-{
+export class RedisService implements IRedisService, OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
   private client: Redis;
   private readonly options: RedisOptions;
@@ -91,13 +83,7 @@ export class RedisService
 
   async acquireLock(key: string, ttlMs: number): Promise<string | null> {
     const lockValue = randomUUID();
-    const result = await this.client.set(
-      `lock:${key}`,
-      lockValue,
-      'PX',
-      ttlMs,
-      'NX',
-    );
+    const result = await this.client.set(`lock:${key}`, lockValue, 'PX', ttlMs, 'NX');
     return result === 'OK' ? lockValue : null;
   }
 

@@ -10,12 +10,9 @@ export const REQUEST_ID_HEADER = 'x-request-id';
 export class CorrelationIdMiddleware implements NestMiddleware {
   use(req: AppRequest, res: Response, next: NextFunction): void {
     const existingId =
-      (req.headers[REQUEST_ID_HEADER] as string) ||
-      (req.headers[CORRELATION_HEADER] as string);
+      (req.headers[REQUEST_ID_HEADER] as string) || (req.headers[CORRELATION_HEADER] as string);
 
-    const requestId = existingId && existingId.trim().length > 0
-      ? existingId.trim()
-      : randomUUID();
+    const requestId = existingId && existingId.trim().length > 0 ? existingId.trim() : randomUUID();
 
     req.id = requestId;
     req.correlationId = requestId;

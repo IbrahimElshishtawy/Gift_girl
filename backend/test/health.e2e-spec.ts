@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
@@ -49,9 +50,7 @@ describe('HealthController (e2e)', () => {
   });
 
   it('/api/health (GET) should return 200 OK when services are healthy', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/api/health')
-      .expect(200);
+    const response = await request(app.getHttpServer()).get('/api/health').expect(200);
 
     expect(response.body.status).toBe('ok');
     expect(response.body.info.database.status).toBe('up');
@@ -61,9 +60,7 @@ describe('HealthController (e2e)', () => {
   it('/api/health (GET) should return 503 Service Unavailable when Redis is unhealthy', async () => {
     redisService.isHealthy!.mockResolvedValueOnce(false);
 
-    const response = await request(app.getHttpServer())
-      .get('/api/health')
-      .expect(503);
+    const response = await request(app.getHttpServer()).get('/api/health').expect(503);
 
     expect(response.body.status).toBe('error');
     expect(response.body.error.redis.status).toBe('down');

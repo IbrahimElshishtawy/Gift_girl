@@ -17,7 +17,10 @@ export class HealthController {
   @HealthCheck()
   @ApiOperation({ summary: 'Check infrastructure dependency status (DB, Redis, App)' })
   @SwaggerResponse({ status: 200, description: 'All infrastructure services are healthy' })
-  @SwaggerResponse({ status: 503, description: 'One or more infrastructure services are unhealthy' })
+  @SwaggerResponse({
+    status: 503,
+    description: 'One or more infrastructure services are unhealthy',
+  })
   check() {
     return this.health.check([
       () => this.prismaHealth.isHealthy('database'),

@@ -12,14 +12,7 @@ import { validateEnv } from './env.validation';
   imports: [
     NestConfigModule.forRoot({
       isGlobal: true,
-      load: [
-        appConfig,
-        databaseConfig,
-        redisConfig,
-        securityConfig,
-        loggingConfig,
-        queueConfig,
-      ],
+      load: [appConfig, databaseConfig, redisConfig, securityConfig, loggingConfig, queueConfig],
       validate: validateEnv,
       envFilePath: ['.env.local', '.env'],
     }),
