@@ -8,6 +8,7 @@ import { HealthModule } from './infrastructure/health/health.module';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { RbacModule } from './modules/rbac/rbac.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AuthModule } from './modules/auth/auth.module';
     RedisModule,
     QueueModule,
     HealthModule,
+    RbacModule,
     UsersModule,
     AuthModule,
   ],
