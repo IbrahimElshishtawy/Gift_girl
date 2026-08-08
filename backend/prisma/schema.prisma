@@ -1,0 +1,20 @@
+// Prisma Schema for Gift Girl Marketplace Infrastructure
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// System Infrastructure Metadata / Audit placeholder for database health validation
+model SystemHealth {
+  id        String   @id @default(uuid())
+  status    String   @default("OK")
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("system_health")
+}
