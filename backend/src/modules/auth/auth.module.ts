@@ -15,10 +15,7 @@ import { RolesGuard } from './presentation/guards/roles.guard';
 import { PermissionsGuard } from './presentation/guards/permissions.guard';
 
 @Module({
-  imports: [
-    UsersModule,
-    JwtModule.register({}),
-  ],
+  imports: [UsersModule, JwtModule.register({})],
   controllers: [AuthController],
   providers: [
     PasswordHasherService,

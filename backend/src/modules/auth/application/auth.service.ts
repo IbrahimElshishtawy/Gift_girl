@@ -103,11 +103,7 @@ export class AuthService {
       userAgent,
     );
 
-    const accessToken = this.jwtAuthService.generateAccessToken(
-      user.id,
-      session.id,
-      user.role,
-    );
+    const accessToken = this.jwtAuthService.generateAccessToken(user.id, session.id, user.role);
 
     return {
       user: user.toSafeUser(),
@@ -119,11 +115,7 @@ export class AuthService {
     };
   }
 
-  async login(
-    dto: LoginDto,
-    ipAddress?: string,
-    userAgent?: string,
-  ): Promise<AuthResponseDto> {
+  async login(dto: LoginDto, ipAddress?: string, userAgent?: string): Promise<AuthResponseDto> {
     const user = await this.usersService.findByIdentity(dto.identity);
 
     // Generic error handling to prevent account enumeration
@@ -172,11 +164,7 @@ export class AuthService {
       userAgent,
     );
 
-    const accessToken = this.jwtAuthService.generateAccessToken(
-      user.id,
-      session.id,
-      user.role,
-    );
+    const accessToken = this.jwtAuthService.generateAccessToken(user.id, session.id, user.role);
 
     return {
       user: user.toSafeUser(),
@@ -217,7 +205,12 @@ export class AuthService {
     };
   }
 
-  async logout(sessionId: string, userId?: string, ipAddress?: string, userAgent?: string): Promise<void> {
+  async logout(
+    sessionId: string,
+    userId?: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<void> {
     await this.sessionService.revokeSession(sessionId, 'LOGOUT');
     await this.securityAuditService.logEvent(
       SecurityEventType.LOGOUT,
@@ -235,6 +228,14 @@ export class AuthService {
       ipAddress,
       userAgent,
     );
+  }
+
+  async getMe(userId: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User profile not found.');
+    }
+    return user.toSafeUser();
   }
 
   async changePassword(
@@ -286,7 +287,8 @@ export class AuthService {
     userAgent?: string,
   ): Promise<{ message: string }> {
     const genericResponse = {
-      message: 'If an account exists matching the provided identity, a password reset code has been sent.',
+      message:
+        'If an account exists matching the provided identity, a password reset code has been sent.',
     };
 
     const user = await this.usersService.findByIdentity(dto.identity);
@@ -301,9 +303,7 @@ export class AuthService {
       data: {
         userId: user.id,
         tokenHash,
-        expiresAt: new Date(
-          Date.now() + this.config.passwordResetExpirationMinutes * 60 * 1000,
-        ),
+        expiresAt: new Date(Date.now() + this.config.passwordResetExpirationMinutes * 60 * 1000),
       },
     });
 
@@ -361,7 +361,9 @@ export class AuthService {
       userAgent,
     );
 
-    return { message: 'Password has been successfully reset. Please log in with your new password.' };
+    return {
+      message: 'Password has been successfully reset. Please log in with your new password.',
+    };
   }
 
   async verifyAccount(

@@ -23,9 +23,9 @@ export class JwtAuthService {
       type: 'access',
     };
 
-    return this.jwtService.sign(payload, {
+    return this.jwtService.sign(payload as object, {
       secret: this.config.jwtAccessSecret,
-      expiresIn: this.config.jwtAccessExpiresIn,
+      expiresIn: this.config.jwtAccessExpiresIn as unknown as number,
     });
   }
 

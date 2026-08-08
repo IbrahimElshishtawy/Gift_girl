@@ -1,6 +1,12 @@
-import { Injectable, Logger, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { UsersRepository } from '../infrastructure/users.repository';
-import { User, Prisma, UserStatus, UserRole } from '@prisma/client';
+import { UserStatus, UserRole } from '@prisma/client';
 import { UserEntity } from '../domain/user.entity';
 
 @Injectable()

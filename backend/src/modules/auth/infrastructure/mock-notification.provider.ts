@@ -15,10 +15,7 @@ export class MockNotificationProvider implements INotificationProvider {
     );
   }
 
-  async sendPasswordResetToken(
-    destination: string,
-    _token: string,
-  ): Promise<void> {
+  async sendPasswordResetToken(destination: string, _token: string): Promise<void> {
     this.logger.log(
       `[MOCK NOTIFICATION] Sent password reset link to ${destination}. (Token redacted for security)`,
     );
