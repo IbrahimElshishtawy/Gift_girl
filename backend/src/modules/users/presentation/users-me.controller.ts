@@ -36,7 +36,9 @@ export class UsersMeController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get current authenticated user identity profile, addresses, and preferences' })
+  @ApiOperation({
+    summary: 'Get current authenticated user identity profile, addresses, and preferences',
+  })
   @ApiResponse({ status: 200, description: 'Safe profile details returned successfully' })
   async getMyProfile(@CurrentUser() user: AuthenticatedUser) {
     const userIdentity = await this.usersService.findById(user.id);

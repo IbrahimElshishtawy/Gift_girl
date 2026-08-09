@@ -23,7 +23,6 @@ describe('User Management & RBAC Module (e2e)', () => {
   let superAdminToken: string;
 
   let createdAddressId: string;
-  let createdAddressId2: string;
 
   // In-memory mocks
   const mockUsers: Record<string, any>[] = [];
@@ -225,7 +224,10 @@ describe('User Management & RBAC Module (e2e)', () => {
       updateMany: jest.fn().mockImplementation(({ where, data }) => {
         let count = 0;
         for (let i = 0; i < mockAddresses.length; i++) {
-          if (mockAddresses[i].userId === where.userId && (where.isDefault === undefined || mockAddresses[i].isDefault === where.isDefault)) {
+          if (
+            mockAddresses[i].userId === where.userId &&
+            (where.isDefault === undefined || mockAddresses[i].isDefault === where.isDefault)
+          ) {
             mockAddresses[i] = { ...mockAddresses[i], ...data, updatedAt: new Date() };
             count++;
           }
@@ -345,7 +347,8 @@ describe('User Management & RBAC Module (e2e)', () => {
       findMany: jest.fn().mockImplementation(({ where }) => {
         let results = [...mockSessions];
         if (where.userId) results = results.filter((s) => s.userId === where.userId);
-        if (where.isRevoked !== undefined) results = results.filter((s) => s.isRevoked === where.isRevoked);
+        if (where.isRevoked !== undefined)
+          results = results.filter((s) => s.isRevoked === where.isRevoked);
         return Promise.resolve(results);
       }),
     },
@@ -363,7 +366,9 @@ describe('User Management & RBAC Module (e2e)', () => {
     onModuleInit: jest.fn(),
     onModuleDestroy: jest.fn(),
     isHealthy: jest.fn().mockResolvedValue(true),
-    get: jest.fn().mockImplementation((key: string) => Promise.resolve(mockRedisMap.get(key) || null)),
+    get: jest
+      .fn()
+      .mockImplementation((key: string) => Promise.resolve(mockRedisMap.get(key) || null)),
     set: jest.fn().mockImplementation((key: string, val: string) => {
       mockRedisMap.set(key, val);
       return Promise.resolve('OK');
@@ -373,7 +378,9 @@ describe('User Management & RBAC Module (e2e)', () => {
       mockRedisMap.delete(key);
       return Promise.resolve(existed ? 1 : 0);
     }),
-    exists: jest.fn().mockImplementation((key: string) => Promise.resolve(mockRedisMap.has(key) ? 1 : 0)),
+    exists: jest
+      .fn()
+      .mockImplementation((key: string) => Promise.resolve(mockRedisMap.has(key) ? 1 : 0)),
     expire: jest.fn().mockResolvedValue(1),
   };
 
@@ -545,7 +552,7 @@ describe('User Management & RBAC Module (e2e)', () => {
   it('PUT /api/admin/users/:id/roles - Admin CANNOT grant SUPER_ADMIN role (Privilege Escalation Protection)', async () => {
     const cust1 = mockUsers.find((u) => u.email === customerEmail);
     await request(app.getHttpServer())
-      .put(`/api/admin/users/${cust1.id}/roles`)
+      .put(`/api/admin/users/${cust1?.id}/roles`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ roles: ['SUPER_ADMIN'] })
       .expect(403);
@@ -554,7 +561,7 @@ describe('User Management & RBAC Module (e2e)', () => {
   it('PUT /api/admin/users/:id/roles - Super Admin CAN grant SUPER_ADMIN role', async () => {
     const cust1 = mockUsers.find((u) => u.email === customerEmail);
     await request(app.getHttpServer())
-      .put(`/api/admin/users/${cust1.id}/roles`)
+      .put(`/api/admin/users/${cust1?.id}/roles`)
       .set('Authorization', `Bearer ${superAdminToken}`)
       .send({ roles: ['ADMIN'] })
       .expect(200);

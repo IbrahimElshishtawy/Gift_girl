@@ -5,10 +5,11 @@ import { RbacService } from './application/rbac.service';
 import { AdminRbacController } from './presentation/admin-rbac.controller';
 import { DatabaseModule } from '../../database/database.module';
 import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 
 @Global()
 @Module({
-  imports: [DatabaseModule, forwardRef(() => AuthModule)],
+  imports: [DatabaseModule, forwardRef(() => AuthModule), forwardRef(() => UsersModule)],
   providers: [RbacRepository, RbacSeederService, RbacService],
   controllers: [AdminRbacController],
   exports: [RbacService, RbacRepository],

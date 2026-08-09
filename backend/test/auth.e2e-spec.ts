@@ -62,8 +62,9 @@ describe('AuthController & Security Audit (e2e)', () => {
           if (where.email && u.email === where.email) return true;
           if (where.phone && u.phone === where.phone) return true;
           if (where.OR) {
-            return (where.OR as Array<Record<string, string>>).some((cond) =>
-              (cond.email && u.email === cond.email) || (cond.phone && u.phone === cond.phone),
+            return (where.OR as Array<Record<string, string>>).some(
+              (cond) =>
+                (cond.email && u.email === cond.email) || (cond.phone && u.phone === cond.phone),
             );
           }
           return false;
@@ -116,7 +117,8 @@ describe('AuthController & Security Audit (e2e)', () => {
         let results = [...mockSessions];
         if (where.familyId) results = results.filter((s) => s.familyId === where.familyId);
         if (where.userId) results = results.filter((s) => s.userId === where.userId);
-        if (where.isRevoked !== undefined) results = results.filter((s) => s.isRevoked === where.isRevoked);
+        if (where.isRevoked !== undefined)
+          results = results.filter((s) => s.isRevoked === where.isRevoked);
         return Promise.resolve(results);
       }),
       update: jest.fn().mockImplementation(({ where, data }) => {
@@ -134,7 +136,8 @@ describe('AuthController & Security Audit (e2e)', () => {
           if (where.id && mockSessions[i].id !== where.id) match = false;
           if (where.familyId && mockSessions[i].familyId !== where.familyId) match = false;
           if (where.userId && mockSessions[i].userId !== where.userId) match = false;
-          if (where.isRevoked !== undefined && mockSessions[i].isRevoked !== where.isRevoked) match = false;
+          if (where.isRevoked !== undefined && mockSessions[i].isRevoked !== where.isRevoked)
+            match = false;
 
           if (match) {
             mockSessions[i] = { ...mockSessions[i], ...data, updatedAt: new Date() };
@@ -205,7 +208,9 @@ describe('AuthController & Security Audit (e2e)', () => {
     onModuleInit: jest.fn(),
     onModuleDestroy: jest.fn(),
     isHealthy: jest.fn().mockResolvedValue(true),
-    get: jest.fn().mockImplementation((key: string) => Promise.resolve(mockRedisMap.get(key) || null)),
+    get: jest
+      .fn()
+      .mockImplementation((key: string) => Promise.resolve(mockRedisMap.get(key) || null)),
     set: jest.fn().mockImplementation((key: string, val: string) => {
       mockRedisMap.set(key, val);
       return Promise.resolve('OK');
@@ -215,7 +220,9 @@ describe('AuthController & Security Audit (e2e)', () => {
       mockRedisMap.delete(key);
       return Promise.resolve(existed ? 1 : 0);
     }),
-    exists: jest.fn().mockImplementation((key: string) => Promise.resolve(mockRedisMap.has(key) ? 1 : 0)),
+    exists: jest
+      .fn()
+      .mockImplementation((key: string) => Promise.resolve(mockRedisMap.has(key) ? 1 : 0)),
     expire: jest.fn().mockResolvedValue(1),
     acquireLock: jest.fn().mockResolvedValue('lock_value'),
     releaseLock: jest.fn().mockResolvedValue(true),
@@ -337,9 +344,7 @@ describe('AuthController & Security Audit (e2e)', () => {
 
   // Scenario F: Access /me without token
   it('F. Access /me without token - should return 401 Unauthorized', async () => {
-    await request(app.getHttpServer())
-      .get('/api/auth/me')
-      .expect(401);
+    await request(app.getHttpServer()).get('/api/auth/me').expect(401);
   });
 
   // Scenario G: Access /me with valid token

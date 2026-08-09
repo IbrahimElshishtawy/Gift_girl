@@ -10,22 +10,26 @@ describe('RbacService', () => {
   let service: RbacService;
 
   const mockRbacRepository = {
-    findPermissionsForUser: jest.fn().mockResolvedValue([
-      { code: 'users.read', resource: 'users', action: 'read' },
-    ]),
-    findAllRoles: jest.fn().mockResolvedValue([
-      { code: 'CUSTOMER', name: 'Customer', isSystem: true },
-    ]),
-    findAllPermissions: jest.fn().mockResolvedValue([
-      { code: 'users.read', resource: 'users', action: 'read' },
-    ]),
-    findRoleByCode: jest.fn().mockImplementation((code: string) =>
-      Promise.resolve({ id: `role_${code}`, code, name: code, isSystem: true }),
-    ),
+    findPermissionsForUser: jest
+      .fn()
+      .mockResolvedValue([{ code: 'users.read', resource: 'users', action: 'read' }]),
+    findAllRoles: jest
+      .fn()
+      .mockResolvedValue([{ code: 'CUSTOMER', name: 'Customer', isSystem: true }]),
+    findAllPermissions: jest
+      .fn()
+      .mockResolvedValue([{ code: 'users.read', resource: 'users', action: 'read' }]),
+    findRoleByCode: jest
+      .fn()
+      .mockImplementation((code: string) =>
+        Promise.resolve({ id: `role_${code}`, code, name: code, isSystem: true }),
+      ),
     findRoleById: jest.fn().mockResolvedValue({ id: 'role_1', code: 'ADMIN' }),
-    findPermissionByCode: jest.fn().mockImplementation((code: string) =>
-      Promise.resolve({ id: `perm_${code}`, code, resource: 'res', action: 'act' }),
-    ),
+    findPermissionByCode: jest
+      .fn()
+      .mockImplementation((code: string) =>
+        Promise.resolve({ id: `perm_${code}`, code, resource: 'res', action: 'act' }),
+      ),
     assignRolesToUser: jest.fn().mockResolvedValue(undefined),
     assignPermissionsToRole: jest.fn().mockResolvedValue(undefined),
   };

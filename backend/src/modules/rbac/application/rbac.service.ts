@@ -34,15 +34,27 @@ export class RbacService {
     return this.rbacRepository.findAllRoles();
   }
 
+  async getRoleById(roleId: string): Promise<RoleEntity> {
+    const role = await this.rbacRepository.findRoleById(roleId);
+    if (!role) {
+      throw new NotFoundException('Role not found.');
+    }
+    return role;
+  }
+
   async getPermissions(): Promise<PermissionEntity[]> {
     return this.rbacRepository.findAllPermissions();
   }
 
-  async createCustomRole(
-    code: string,
-    name: string,
-    description?: string,
-  ): Promise<RoleEntity> {
+  async getPermissionsForRole(roleId: string): Promise<PermissionEntity[]> {
+    const role = await this.rbacRepository.findRoleById(roleId);
+    if (!role) {
+      throw new NotFoundException('Role not found.');
+    }
+    return this.rbacRepository.findPermissionsForRole(roleId);
+  }
+
+  async createCustomRole(code: string, name: string, description?: string): Promise<RoleEntity> {
     const normalizedCode = code.toUpperCase();
     const existing = await this.rbacRepository.findRoleByCode(normalizedCode);
     if (existing) {
@@ -55,6 +67,32 @@ export class RbacService {
       description,
       isSystem: false,
     });
+  }
+
+  async updateCustomRole(
+    roleId: string,
+    name?: string,
+    description?: string,
+  ): Promise<RoleEntity> {
+    const role = await this.rbacRepository.findRoleById(roleId);
+    if (!role) {
+      throw new NotFoundException('Role not found.');
+    }
+    if (role.isSystem) {
+      throw new ForbiddenException('Protected system roles cannot be modified.');
+    }
+    return this.rbacRepository.updateRole(roleId, { name, description });
+  }
+
+  async deleteCustomRole(roleId: string): Promise<void> {
+    const role = await this.rbacRepository.findRoleById(roleId);
+    if (!role) {
+      throw new NotFoundException('Role not found.');
+    }
+    if (role.isSystem) {
+      throw new ForbiddenException('Protected system roles cannot be deleted.');
+    }
+    await this.rbacRepository.deleteRole(roleId);
   }
 
   async assignRolesToUser(

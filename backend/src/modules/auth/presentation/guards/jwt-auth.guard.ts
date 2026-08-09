@@ -1,4 +1,11 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { JwtAuthService } from '../../infrastructure/jwt-auth.service';
 import { SessionService } from '../../infrastructure/session.service';
 import { UsersService } from '../../../users/application/users.service';
@@ -10,6 +17,7 @@ export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtAuthService: JwtAuthService,
     private readonly sessionService: SessionService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ) {}
 

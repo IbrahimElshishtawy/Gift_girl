@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
   Put,
   Param,
@@ -19,7 +20,7 @@ import { Roles } from '../../auth/presentation/decorators/roles.decorator';
 import { Permissions } from '../../auth/presentation/decorators/permissions.decorator';
 import { CurrentUser } from '../../auth/presentation/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../../auth/domain/authenticated-user.interface';
-import { UserRole, UserStatus, SecurityEventType } from '@prisma/client';
+import { UserRole, UserStatus, SecurityEventType, Prisma } from '@prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
 import { RbacService } from '../../rbac/application/rbac.service';
 import { SecurityAuditService } from '../../auth/infrastructure/security-audit.service';
@@ -42,14 +43,16 @@ export class AdminUsersController {
 
   @Get()
   @Permissions('users.read')
-  @ApiOperation({ summary: 'Paginated, searched, and filtered administrative list of platform users' })
+  @ApiOperation({
+    summary: 'Paginated, searched, and filtered administrative list of platform users',
+  })
   @ApiResponse({ status: 200, description: 'User list returned successfully' })
   async listUsers(@Query() query: AdminUserQueryDto) {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
 
     if (query.status) {
       where.status = query.status;
@@ -167,37 +170,60 @@ export class AdminUsersController {
     @Body() dto: AdminUpdateUserStatusDto,
     @Req() req: AppRequest,
   ) {
-    const targetUser = await this.prisma.user.findUnique({ where: { id: targetUserId } });
-    if (!targetUser) throw new NotFoundException('User not found.');
+    return this.applyUserStatusChange(adminUser, targetUserId, dto.status, dto.reason, req);
+  }
 
-    // Protect Super Admin from non-Super Admin suspension/disable
-    if (targetUser.role === UserRole.SUPER_ADMIN && adminUser.role !== UserRole.SUPER_ADMIN) {
-      throw new ForbiddenException('Only a Super Administrator can change the status of another Super Administrator.');
-    }
-
-    const updated = await this.prisma.user.update({
-      where: { id: targetUserId },
-      data: {
-        status: dto.status,
-      },
-    });
-
-    const ip = req.ip || req.socket.remoteAddress;
-    const ua = req.headers['user-agent'];
-
-    await this.securityAuditService.logEvent(
-      SecurityEventType.ACCOUNT_STATUS_CHANGE,
-      adminUser.id,
-      ip,
-      ua,
-      { targetUserId, previousStatus: targetUser.status, newStatus: dto.status, reason: dto.reason },
+  @Post(':id/suspend')
+  @Permissions('users.suspend')
+  @ApiOperation({ summary: 'Suspend user account' })
+  async suspendUser(
+    @CurrentUser() adminUser: AuthenticatedUser,
+    @Param('id') targetUserId: string,
+    @Body() body: { reason?: string },
+    @Req() req: AppRequest,
+  ) {
+    return this.applyUserStatusChange(
+      adminUser,
+      targetUserId,
+      UserStatus.SUSPENDED,
+      body?.reason,
+      req,
     );
+  }
 
-    return {
-      id: updated.id,
-      status: updated.status,
-      updatedAt: updated.updatedAt,
-    };
+  @Post(':id/activate')
+  @Permissions('users.suspend')
+  @ApiOperation({ summary: 'Activate user account' })
+  async activateUser(
+    @CurrentUser() adminUser: AuthenticatedUser,
+    @Param('id') targetUserId: string,
+    @Req() req: AppRequest,
+  ) {
+    return this.applyUserStatusChange(
+      adminUser,
+      targetUserId,
+      UserStatus.ACTIVE,
+      'Account activated by administrator',
+      req,
+    );
+  }
+
+  @Post(':id/disable')
+  @Permissions('users.suspend')
+  @ApiOperation({ summary: 'Disable user account' })
+  async disableUser(
+    @CurrentUser() adminUser: AuthenticatedUser,
+    @Param('id') targetUserId: string,
+    @Body() body: { reason?: string },
+    @Req() req: AppRequest,
+  ) {
+    return this.applyUserStatusChange(
+      adminUser,
+      targetUserId,
+      UserStatus.DISABLED,
+      body?.reason,
+      req,
+    );
   }
 
   @Put(':id/roles')
@@ -226,5 +252,49 @@ export class AdminUsersController {
     });
 
     return updatedUser;
+  }
+
+  private async applyUserStatusChange(
+    adminUser: AuthenticatedUser,
+    targetUserId: string,
+    newStatus: UserStatus,
+    reason: string | undefined,
+    req: AppRequest,
+  ) {
+    const targetUser = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!targetUser) throw new NotFoundException('User not found.');
+
+    if (targetUser.role === UserRole.SUPER_ADMIN && adminUser.role !== UserRole.SUPER_ADMIN) {
+      throw new ForbiddenException(
+        'Only a Super Administrator can change the status of another Super Administrator.',
+      );
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: targetUserId },
+      data: { status: newStatus },
+    });
+
+    const ip = req.ip || req.socket.remoteAddress;
+    const ua = req.headers['user-agent'];
+
+    await this.securityAuditService.logEvent(
+      SecurityEventType.ACCOUNT_STATUS_CHANGE,
+      adminUser.id,
+      ip,
+      ua,
+      {
+        targetUserId,
+        previousStatus: targetUser.status,
+        newStatus,
+        reason,
+      },
+    );
+
+    return {
+      id: updated.id,
+      status: updated.status,
+      updatedAt: updated.updatedAt,
+    };
   }
 }
