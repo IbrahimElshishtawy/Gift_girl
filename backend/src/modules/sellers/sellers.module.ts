@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../database/database.module';
 import { RbacModule } from '../rbac/rbac.module';
 import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 
 // Repositories
 import { SellersRepository } from './infrastructure/sellers.repository';
@@ -24,7 +25,7 @@ import { AdminStoresController } from './presentation/admin-stores.controller';
 import { PublicStoresController } from './presentation/public-stores.controller';
 
 @Module({
-  imports: [DatabaseModule, RbacModule, AuthModule],
+  imports: [DatabaseModule, RbacModule, AuthModule, UsersModule],
   providers: [
     SellersRepository,
     SellerApplicationsRepository,

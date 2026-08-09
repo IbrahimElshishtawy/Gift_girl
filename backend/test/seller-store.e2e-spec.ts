@@ -103,28 +103,28 @@ describe('Seller & Store Domain Module (e2e)', () => {
       }),
       findFirst: jest.fn().mockImplementation(({ where }) => {
         const found = mockUsers.find(
-          (u: any) => u.email === where?.email || u.phone === where?.phone,
+          (u: Record<string, unknown>) => u.email === where?.email || u.phone === where?.phone,
         );
         return Promise.resolve(found || null);
       }),
       findUnique: jest.fn().mockImplementation(({ where, include, select }) => {
-        const found = mockUsers.find((u: any) => u.id === where.id);
+        const found = mockUsers.find((u: Record<string, unknown>) => u.id === where.id);
         if (!found) return Promise.resolve(null);
-        const res: any = { ...found };
+        const res: Record<string, unknown> = { ...found };
 
         if (include?.roleAssignments || select?.roleAssignments) {
           res.roleAssignments = mockUserRoles
-            .filter((ur: any) => ur.userId === found.id)
-            .map((ur: any) => ({
+            .filter((ur: Record<string, unknown>) => ur.userId === found.id)
+            .map((ur: Record<string, unknown>) => ({
               ...ur,
-              role: mockRoles.find((r: any) => r.id === ur.roleId),
+              role: mockRoles.find((r: Record<string, unknown>) => r.id === ur.roleId),
             }));
         }
         return Promise.resolve(res);
       }),
       findMany: jest.fn().mockImplementation(() => Promise.resolve(mockUsers)),
       update: jest.fn().mockImplementation(({ where, data }) => {
-        const idx = mockUsers.findIndex((u: any) => u.id === where.id);
+        const idx = mockUsers.findIndex((u: Record<string, unknown>) => u.id === where.id);
         if (idx !== -1) {
           mockUsers[idx] = { ...mockUsers[idx], ...data, updatedAt: new Date() };
           return Promise.resolve(mockUsers[idx]);
@@ -135,13 +135,14 @@ describe('Seller & Store Domain Module (e2e)', () => {
     seller: {
       findUnique: jest.fn().mockImplementation(({ where }) => {
         const found = mockSellers.find(
-          (s: any) => s.id === where?.id || s.userId === where?.userId,
+          (s: Record<string, unknown>) => s.id === where?.id || s.userId === where?.userId,
         );
         return Promise.resolve(found || null);
       }),
       findMany: jest.fn().mockImplementation(({ where }) => {
         let results = [...mockSellers];
-        if (where?.status) results = results.filter((s: any) => s.status === where.status);
+        if (where?.status)
+          results = results.filter((s: Record<string, unknown>) => s.status === where.status);
         return Promise.resolve(results);
       }),
       count: jest.fn().mockImplementation(() => Promise.resolve(mockSellers.length)),
@@ -158,7 +159,7 @@ describe('Seller & Store Domain Module (e2e)', () => {
         return Promise.resolve(newSeller);
       }),
       update: jest.fn().mockImplementation(({ where, data }) => {
-        const idx = mockSellers.findIndex((s: any) => s.id === where.id);
+        const idx = mockSellers.findIndex((s: Record<string, unknown>) => s.id === where.id);
         if (idx !== -1) {
           mockSellers[idx] = { ...mockSellers[idx], ...data, updatedAt: new Date() };
           return Promise.resolve(mockSellers[idx]);
@@ -168,11 +169,13 @@ describe('Seller & Store Domain Module (e2e)', () => {
     },
     sellerApplication: {
       findUnique: jest.fn().mockImplementation(({ where }) => {
-        const found = mockApplications.find((a: any) => a.id === where.id);
+        const found = mockApplications.find((a: Record<string, unknown>) => a.id === where.id);
         return Promise.resolve(found || null);
       }),
       findFirst: jest.fn().mockImplementation(({ where }) => {
-        const found = mockApplications.find((a: any) => a.userId === where.userId);
+        const found = mockApplications.find(
+          (a: Record<string, unknown>) => a.userId === where.userId,
+        );
         return Promise.resolve(found || null);
       }),
       create: jest.fn().mockImplementation(({ data }) => {
@@ -189,7 +192,7 @@ describe('Seller & Store Domain Module (e2e)', () => {
         return Promise.resolve(newApp);
       }),
       update: jest.fn().mockImplementation(({ where, data }) => {
-        const idx = mockApplications.findIndex((a: any) => a.id === where.id);
+        const idx = mockApplications.findIndex((a: Record<string, unknown>) => a.id === where.id);
         if (idx !== -1) {
           mockApplications[idx] = { ...mockApplications[idx], ...data, updatedAt: new Date() };
           return Promise.resolve(mockApplications[idx]);
@@ -199,11 +202,13 @@ describe('Seller & Store Domain Module (e2e)', () => {
     },
     sellerDocument: {
       findUnique: jest.fn().mockImplementation(({ where }) => {
-        const found = mockDocuments.find((d: any) => d.id === where.id);
+        const found = mockDocuments.find((d: Record<string, unknown>) => d.id === where.id);
         return Promise.resolve(found || null);
       }),
       findMany: jest.fn().mockImplementation(({ where }) => {
-        return Promise.resolve(mockDocuments.filter((d: any) => d.sellerId === where.sellerId));
+        return Promise.resolve(
+          mockDocuments.filter((d: Record<string, unknown>) => d.sellerId === where.sellerId),
+        );
       }),
       create: jest.fn().mockImplementation(({ data }) => {
         const newDoc = {
@@ -218,7 +223,7 @@ describe('Seller & Store Domain Module (e2e)', () => {
         return Promise.resolve(newDoc);
       }),
       update: jest.fn().mockImplementation(({ where, data }) => {
-        const idx = mockDocuments.findIndex((d: any) => d.id === where.id);
+        const idx = mockDocuments.findIndex((d: Record<string, unknown>) => d.id === where.id);
         if (idx !== -1) {
           mockDocuments[idx] = { ...mockDocuments[idx], ...data };
           return Promise.resolve(mockDocuments[idx]);
@@ -228,16 +233,21 @@ describe('Seller & Store Domain Module (e2e)', () => {
     },
     store: {
       findUnique: jest.fn().mockImplementation(({ where, include }) => {
-        const found = mockStores.find((s: any) => s.id === where?.id || s.slug === where?.slug);
+        const found = mockStores.find(
+          (s: Record<string, unknown>) => s.id === where?.id || s.slug === where?.slug,
+        );
         if (!found) return Promise.resolve(null);
-        const res: any = { ...found };
+        const res: Record<string, unknown> = { ...found };
         if (include?.seller) {
-          res.seller = mockSellers.find((sel: any) => sel.id === found.sellerId) || null;
+          res.seller =
+            mockSellers.find((sel: Record<string, unknown>) => sel.id === found.sellerId) || null;
         }
         return Promise.resolve(res);
       }),
       findFirst: jest.fn().mockImplementation(({ where }) => {
-        const found = mockStores.find((s: any) => s.sellerId === where?.sellerId);
+        const found = mockStores.find(
+          (s: Record<string, unknown>) => s.sellerId === where?.sellerId,
+        );
         return Promise.resolve(found || null);
       }),
       findMany: jest.fn().mockImplementation(() => Promise.resolve(mockStores)),
@@ -256,7 +266,7 @@ describe('Seller & Store Domain Module (e2e)', () => {
         return Promise.resolve(newStore);
       }),
       update: jest.fn().mockImplementation(({ where, data }) => {
-        const idx = mockStores.findIndex((s: any) => s.id === where.id);
+        const idx = mockStores.findIndex((s: Record<string, unknown>) => s.id === where.id);
         if (idx !== -1) {
           mockStores[idx] = { ...mockStores[idx], ...data, updatedAt: new Date() };
           return Promise.resolve(mockStores[idx]);
@@ -268,17 +278,19 @@ describe('Seller & Store Domain Module (e2e)', () => {
       findUnique: jest.fn().mockImplementation(({ where }) => {
         if (where.sellerId_userId) {
           const found = mockStaff.find(
-            (st: any) =>
+            (st: Record<string, unknown>) =>
               st.sellerId === where.sellerId_userId.sellerId &&
               st.userId === where.sellerId_userId.userId,
           );
           return Promise.resolve(found || null);
         }
-        const found = mockStaff.find((st: any) => st.id === where.id);
+        const found = mockStaff.find((st: Record<string, unknown>) => st.id === where.id);
         return Promise.resolve(found || null);
       }),
       findMany: jest.fn().mockImplementation(({ where }) => {
-        return Promise.resolve(mockStaff.filter((st: any) => st.sellerId === where.sellerId));
+        return Promise.resolve(
+          mockStaff.filter((st: Record<string, unknown>) => st.sellerId === where.sellerId),
+        );
       }),
       create: jest.fn().mockImplementation(({ data }) => {
         const newStf = {
@@ -296,7 +308,7 @@ describe('Seller & Store Domain Module (e2e)', () => {
         return Promise.resolve(newStf);
       }),
       update: jest.fn().mockImplementation(({ where, data }) => {
-        const idx = mockStaff.findIndex((st: any) => st.id === where.id);
+        const idx = mockStaff.findIndex((st: Record<string, unknown>) => st.id === where.id);
         if (idx !== -1) {
           mockStaff[idx] = { ...mockStaff[idx], ...data, updatedAt: new Date() };
           return Promise.resolve(mockStaff[idx]);
@@ -304,7 +316,7 @@ describe('Seller & Store Domain Module (e2e)', () => {
         return Promise.resolve(null);
       }),
       delete: jest.fn().mockImplementation(({ where }) => {
-        const idx = mockStaff.findIndex((st: any) => st.id === where.id);
+        const idx = mockStaff.findIndex((st: Record<string, unknown>) => st.id === where.id);
         if (idx !== -1) {
           const deleted = mockStaff.splice(idx, 1)[0];
           return Promise.resolve(deleted);
@@ -314,13 +326,17 @@ describe('Seller & Store Domain Module (e2e)', () => {
     },
     role: {
       findUnique: jest.fn().mockImplementation(({ where }) => {
-        const found = mockRoles.find((r: any) => r.code === where.code || r.id === where.id);
+        const found = mockRoles.find(
+          (r: Record<string, unknown>) => r.code === where.code || r.id === where.id,
+        );
         if (!found) return Promise.resolve(null);
         const rPermissions = mockRolePermissions
-          .filter((rp: any) => rp.roleId === found.id)
-          .map((rp: any) => ({
+          .filter((rp: Record<string, unknown>) => rp.roleId === found.id)
+          .map((rp: Record<string, unknown>) => ({
             ...rp,
-            permission: mockPermissions.find((p: any) => p.id === rp.permissionId),
+            permission: mockPermissions.find(
+              (p: Record<string, unknown>) => p.id === rp.permissionId,
+            ),
           }));
         return Promise.resolve({ ...found, rolePermissions: rPermissions });
       }),
@@ -328,7 +344,9 @@ describe('Seller & Store Domain Module (e2e)', () => {
     },
     permission: {
       findUnique: jest.fn().mockImplementation(({ where }) => {
-        const found = mockPermissions.find((p: any) => p.code === where.code || p.id === where.id);
+        const found = mockPermissions.find(
+          (p: Record<string, unknown>) => p.code === where.code || p.id === where.id,
+        );
         return Promise.resolve(found || null);
       }),
       findMany: jest.fn().mockResolvedValue(mockPermissions),
@@ -368,10 +386,14 @@ describe('Seller & Store Domain Module (e2e)', () => {
         return Promise.resolve(newSession);
       }),
       findUnique: jest.fn().mockImplementation(({ where }) => {
-        return Promise.resolve(mockSessions.find((s: any) => s.id === where.id) || null);
+        return Promise.resolve(
+          mockSessions.find((s: Record<string, unknown>) => s.id === where.id) || null,
+        );
       }),
       findMany: jest.fn().mockImplementation(({ where }) => {
-        return Promise.resolve(mockSessions.filter((s: any) => s.userId === where.userId));
+        return Promise.resolve(
+          mockSessions.filter((s: Record<string, unknown>) => s.userId === where.userId),
+        );
       }),
     },
     verificationToken: {
@@ -439,23 +461,23 @@ describe('Seller & Store Domain Module (e2e)', () => {
       .post('/api/auth/register')
       .send({ email: customer1Email, password: testPassword });
     customer1Token = cust1Res.body.tokens.accessToken;
-    const c1 = mockUsers.find((u: any) => u.email === customer1Email);
-    if (c1) seller1UserId = c1.id;
+    const c1 = mockUsers.find((u: Record<string, unknown>) => u.email === customer1Email);
+    if (c1) seller1UserId = c1.id as string;
 
     // Register Customer 2
     const cust2Res = await request(app.getHttpServer())
       .post('/api/auth/register')
       .send({ email: customer2Email, password: testPassword });
     customer2Token = cust2Res.body.tokens.accessToken;
-    const c2 = mockUsers.find((u: any) => u.email === customer2Email);
-    if (c2) seller2UserId = c2.id;
+    const c2 = mockUsers.find((u: Record<string, unknown>) => u.email === customer2Email);
+    if (c2) seller2UserId = c2.id as string;
 
     // Register Admin
     const adminRes = await request(app.getHttpServer())
       .post('/api/auth/register')
       .send({ email: adminEmail, password: testPassword });
     adminToken = adminRes.body.tokens.accessToken;
-    const adminUser = mockUsers.find((u: any) => u.email === adminEmail);
+    const adminUser = mockUsers.find((u: Record<string, unknown>) => u.email === adminEmail);
     if (adminUser) {
       adminUser.role = 'ADMIN';
       mockUserRoles.push({ userId: adminUser.id, roleId: 'r_3' });
@@ -517,12 +539,16 @@ describe('Seller & Store Domain Module (e2e)', () => {
     expect(res.body.status).toBe('APPROVED');
 
     // Verify Seller entity was created
-    const createdSeller = mockSellers.find((s: any) => s.userId === seller1UserId);
+    const createdSeller = mockSellers.find(
+      (s: Record<string, unknown>) => s.userId === seller1UserId,
+    );
     expect(createdSeller).toBeDefined();
-    if (createdSeller) seller1Id = createdSeller.id;
+    if (createdSeller) seller1Id = createdSeller.id as string;
 
     // Verify user role was upgraded to SELLER in mockUserRoles
-    const assignedRole = mockUserRoles.find((ur: any) => ur.userId === seller1UserId);
+    const assignedRole = mockUserRoles.find(
+      (ur: Record<string, unknown>) => ur.userId === seller1UserId,
+    );
     expect(assignedRole?.roleId).toBe('r_2');
   });
 
@@ -666,7 +692,9 @@ describe('Seller & Store Domain Module (e2e)', () => {
   // 24. Audit events generated
   it('Verify SecurityAuditEvents were created for seller actions', () => {
     expect(mockAuditEvents.length).toBeGreaterThan(0);
-    const approvedEvent = mockAuditEvents.find((e: any) => e.event === 'SELLER_APPROVED');
+    const approvedEvent = mockAuditEvents.find(
+      (e: Record<string, unknown>) => e.event === 'SELLER_APPROVED',
+    );
     expect(approvedEvent).toBeDefined();
   });
 });
