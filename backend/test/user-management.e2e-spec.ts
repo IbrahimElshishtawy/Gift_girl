@@ -500,7 +500,8 @@ describe('User Management & RBAC Module (e2e)', () => {
       .expect(201);
 
     expect(res.body.isDefault).toBe(true);
-    createdAddressId2 = res.body.id;
+    const addressId2 = res.body.id;
+    expect(addressId2).toBeDefined();
 
     // Verify Address A is now isDefault: false
     const addr1 = mockAddresses.find((a) => a.id === createdAddressId);
