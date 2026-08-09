@@ -1,14 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Query,
-  Body,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Param, Query, Body, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/presentation/guards/roles.guard';
 import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard';
@@ -20,7 +11,6 @@ import { UserRole, SellerStatus, SellerDocumentStatus } from '@prisma/client';
 import { SellerOnboardingService } from '../application/seller-onboarding.service';
 import { SellersService } from '../application/sellers.service';
 import { AdminSellerQueryDto } from './dto/admin-seller-query.dto';
-import { AdminUpdateSellerStatusDto } from './dto/admin-update-seller-status.dto';
 import { AppRequest } from '../../../common/types/request-context.interface';
 
 @ApiTags('Admin Seller Management')

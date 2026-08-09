@@ -12,7 +12,10 @@ export class UpdateSellerProfileDto {
   @IsString()
   legalName?: string;
 
-  @ApiPropertyOptional({ example: 'Premium women fashion and handmade gifts', description: 'Business description' })
+  @ApiPropertyOptional({
+    example: 'Premium women fashion and handmade gifts',
+    description: 'Business description',
+  })
   @IsOptional()
   @IsString()
   description?: string;

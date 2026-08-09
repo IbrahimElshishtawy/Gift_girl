@@ -53,7 +53,9 @@ describe('SellersService', () => {
     findBySellerId: jest.fn().mockResolvedValue([mockStaff]),
     findBySellerAndUser: jest.fn().mockResolvedValue(null),
     create: jest.fn().mockResolvedValue(mockStaff),
-    updateStatus: jest.fn().mockResolvedValue({ ...mockStaff, status: SellerStaffStatus.SUSPENDED }),
+    updateStatus: jest
+      .fn()
+      .mockResolvedValue({ ...mockStaff, status: SellerStaffStatus.SUSPENDED }),
     delete: jest.fn().mockResolvedValue(undefined),
   };
 
@@ -92,7 +94,12 @@ describe('SellersService', () => {
   });
 
   it('should suspend seller profile by admin', async () => {
-    const suspended = await service.updateSellerStatus('admin_1', 'sel_1', SellerStatus.SUSPENDED, 'Policy violation');
+    const suspended = await service.updateSellerStatus(
+      'admin_1',
+      'sel_1',
+      SellerStatus.SUSPENDED,
+      'Policy violation',
+    );
     expect(suspended.status).toBe(SellerStatus.SUSPENDED);
     expect(mockAuditService.logEvent).toHaveBeenCalled();
   });

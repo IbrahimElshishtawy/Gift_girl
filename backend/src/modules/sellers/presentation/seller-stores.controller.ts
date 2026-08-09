@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
 import { CurrentUser } from '../../auth/presentation/decorators/current-user.decorator';
@@ -30,19 +23,13 @@ export class SellerStoresController {
   @Post()
   @ApiOperation({ summary: 'Create a new storefront for authenticated active seller' })
   @ApiResponse({ status: 201, description: 'Store created in DRAFT status' })
-  async createStore(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: CreateStoreDto,
-  ) {
+  async createStore(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateStoreDto) {
     return this.storesService.createStore(user.id, dto);
   }
 
   @Patch()
   @ApiOperation({ summary: 'Update storefront details' })
-  async updateStore(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: UpdateStoreDto,
-  ) {
+  async updateStore(@CurrentUser() user: AuthenticatedUser, @Body() dto: UpdateStoreDto) {
     return this.storesService.updateStore(user.id, dto);
   }
 

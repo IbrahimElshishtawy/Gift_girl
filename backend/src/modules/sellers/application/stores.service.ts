@@ -145,10 +145,7 @@ export class StoresService {
       throw new BadRequestException(`Store cannot be submitted from status '${store.status}'.`);
     }
 
-    const updated = await this.storesRepository.updateStatus(
-      store.id,
-      StoreStatus.PENDING_REVIEW,
-    );
+    const updated = await this.storesRepository.updateStatus(store.id, StoreStatus.PENDING_REVIEW);
 
     await this.securityAuditService.logEvent(
       SecurityEventType.STORE_SUBMITTED,

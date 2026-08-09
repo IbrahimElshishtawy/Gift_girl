@@ -7,7 +7,10 @@ export class AddSellerStaffDto {
   @IsNotEmpty()
   targetUserId!: string;
 
-  @ApiPropertyOptional({ example: 'CATALOG_STAFF', description: 'Staff role within the seller team' })
+  @ApiPropertyOptional({
+    example: 'CATALOG_STAFF',
+    description: 'Staff role within the seller team',
+  })
   @IsOptional()
   @IsString()
   role?: string;

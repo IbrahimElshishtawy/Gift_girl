@@ -102,7 +102,9 @@ describe('Seller & Store Domain Module (e2e)', () => {
         return Promise.resolve(newUser);
       }),
       findFirst: jest.fn().mockImplementation(({ where }) => {
-        const found = mockUsers.find((u: any) => u.email === where?.email || u.phone === where?.phone);
+        const found = mockUsers.find(
+          (u: any) => u.email === where?.email || u.phone === where?.phone,
+        );
         return Promise.resolve(found || null);
       }),
       findUnique: jest.fn().mockImplementation(({ where, include, select }) => {
@@ -226,9 +228,7 @@ describe('Seller & Store Domain Module (e2e)', () => {
     },
     store: {
       findUnique: jest.fn().mockImplementation(({ where, include }) => {
-        const found = mockStores.find(
-          (s: any) => s.id === where?.id || s.slug === where?.slug,
-        );
+        const found = mockStores.find((s: any) => s.id === where?.id || s.slug === where?.slug);
         if (!found) return Promise.resolve(null);
         const res: any = { ...found };
         if (include?.seller) {
@@ -392,7 +392,9 @@ describe('Seller & Store Domain Module (e2e)', () => {
     onModuleInit: jest.fn(),
     onModuleDestroy: jest.fn(),
     isHealthy: jest.fn().mockResolvedValue(true),
-    get: jest.fn().mockImplementation((key: string) => Promise.resolve(mockRedisMap.get(key) || null)),
+    get: jest
+      .fn()
+      .mockImplementation((key: string) => Promise.resolve(mockRedisMap.get(key) || null)),
     set: jest.fn().mockImplementation((key: string, val: string) => {
       mockRedisMap.set(key, val);
       return Promise.resolve('OK');
@@ -402,7 +404,9 @@ describe('Seller & Store Domain Module (e2e)', () => {
       mockRedisMap.delete(key);
       return Promise.resolve(existed ? 1 : 0);
     }),
-    exists: jest.fn().mockImplementation((key: string) => Promise.resolve(mockRedisMap.has(key) ? 1 : 0)),
+    exists: jest
+      .fn()
+      .mockImplementation((key: string) => Promise.resolve(mockRedisMap.has(key) ? 1 : 0)),
     expire: jest.fn().mockResolvedValue(1),
   };
 
@@ -544,9 +548,7 @@ describe('Seller & Store Domain Module (e2e)', () => {
 
   // 10 & 11. DRAFT store is not publicly visible
   it('GET /api/stores/:slug - DRAFT store is NOT publicly visible (404 Not Found)', async () => {
-    await request(app.getHttpServer())
-      .get(`/api/stores/${store1Slug}`)
-      .expect(404);
+    await request(app.getHttpServer()).get(`/api/stores/${store1Slug}`).expect(404);
   });
 
   // Submit store for review
@@ -571,9 +573,7 @@ describe('Seller & Store Domain Module (e2e)', () => {
 
   // 10. ACTIVE store is publicly visible
   it('GET /api/stores/:slug - ACTIVE store is publicly visible (200 OK)', async () => {
-    const res = await request(app.getHttpServer())
-      .get(`/api/stores/${store1Slug}`)
-      .expect(200);
+    const res = await request(app.getHttpServer()).get(`/api/stores/${store1Slug}`).expect(200);
 
     expect(res.body.name).toBe('Lotus Gift Store');
     expect(res.body.slug).toBe(store1Slug);

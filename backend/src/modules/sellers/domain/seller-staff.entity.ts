@@ -1,7 +1,4 @@
-import {
-  SellerStaff as PrismaSellerStaff,
-  SellerStaffStatus,
-} from '@prisma/client';
+import { SellerStaff as PrismaSellerStaff, SellerStaffStatus } from '@prisma/client';
 
 export class SellerStaffEntity {
   constructor(

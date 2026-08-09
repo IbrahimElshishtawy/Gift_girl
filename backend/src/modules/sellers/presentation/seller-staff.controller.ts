@@ -43,13 +43,7 @@ export class SellerStaffController {
   ) {
     const ip = req.ip || req.socket.remoteAddress;
     const ua = req.headers['user-agent'];
-    return this.sellersService.addStaffMember(
-      user.id,
-      dto.targetUserId,
-      dto.role,
-      ip,
-      ua,
-    );
+    return this.sellersService.addStaffMember(user.id, dto.targetUserId, dto.role, ip, ua);
   }
 
   @Patch(':id')
@@ -62,13 +56,7 @@ export class SellerStaffController {
   ) {
     const ip = req.ip || req.socket.remoteAddress;
     const ua = req.headers['user-agent'];
-    return this.sellersService.updateStaffStatus(
-      user.id,
-      staffId,
-      body.status,
-      ip,
-      ua,
-    );
+    return this.sellersService.updateStaffStatus(user.id, staffId, body.status, ip, ua);
   }
 
   @Delete(':id')

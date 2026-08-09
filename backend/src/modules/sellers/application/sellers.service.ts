@@ -3,7 +3,6 @@ import {
   NotFoundException,
   ForbiddenException,
   ConflictException,
-  BadRequestException,
 } from '@nestjs/common';
 import { SellersRepository } from '../infrastructure/sellers.repository';
 import { SellerStaffRepository } from '../infrastructure/seller-staff.repository';
@@ -50,10 +49,7 @@ export class SellersService {
     return SellerEntity.fromPrisma(seller);
   }
 
-  async updateSellerProfile(
-    userId: string,
-    data: UpdateSellerProfileData,
-  ): Promise<SellerEntity> {
+  async updateSellerProfile(userId: string, data: UpdateSellerProfileData): Promise<SellerEntity> {
     const seller = await this.sellersRepository.findByUserId(userId);
     if (!seller) {
       throw new NotFoundException('Seller profile not found for this user.');
@@ -219,7 +215,9 @@ export class SellersService {
     if (!staff) throw new NotFoundException('Staff record not found.');
 
     if (staff.sellerId !== seller.id) {
-      throw new ForbiddenException('Ownership protection: You cannot modify another seller staff member.');
+      throw new ForbiddenException(
+        'Ownership protection: You cannot modify another seller staff member.',
+      );
     }
 
     const updated = await this.staffRepository.updateStatus(staffId, status);
@@ -248,7 +246,9 @@ export class SellersService {
     if (!staff) throw new NotFoundException('Staff record not found.');
 
     if (staff.sellerId !== seller.id) {
-      throw new ForbiddenException('Ownership protection: You cannot remove another seller staff member.');
+      throw new ForbiddenException(
+        'Ownership protection: You cannot remove another seller staff member.',
+      );
     }
 
     await this.staffRepository.delete(staffId);

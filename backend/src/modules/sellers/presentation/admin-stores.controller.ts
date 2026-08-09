@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Query,
-  Body,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/presentation/guards/roles.guard';
@@ -19,7 +10,6 @@ import { AuthenticatedUser } from '../../auth/domain/authenticated-user.interfac
 import { UserRole, StoreStatus } from '@prisma/client';
 import { StoresService } from '../application/stores.service';
 import { AdminStoreQueryDto } from './dto/admin-store-query.dto';
-import { AdminUpdateStoreStatusDto } from './dto/admin-update-store-status.dto';
 import { AppRequest } from '../../../common/types/request-context.interface';
 
 @ApiTags('Admin Store Management')

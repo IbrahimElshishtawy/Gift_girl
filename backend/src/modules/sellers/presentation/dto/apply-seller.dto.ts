@@ -32,7 +32,10 @@ export class ApplySellerDto {
   @IsNotEmpty()
   contactEmail!: string;
 
-  @ApiPropertyOptional({ example: 'We specialize in handcrafted women dresses', description: 'Application notes' })
+  @ApiPropertyOptional({
+    example: 'We specialize in handcrafted women dresses',
+    description: 'Application notes',
+  })
   @IsOptional()
   @IsString()
   notes?: string;

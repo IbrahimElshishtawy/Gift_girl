@@ -15,17 +15,26 @@ export class CreateStoreDto {
   })
   slug!: string;
 
-  @ApiPropertyOptional({ example: 'Handmade luxury gifts and accessories for women', description: 'Store description' })
+  @ApiPropertyOptional({
+    example: 'Handmade luxury gifts and accessories for women',
+    description: 'Store description',
+  })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ example: 'https://cdn.example.com/logo.png', description: 'Store logo URL' })
+  @ApiPropertyOptional({
+    example: 'https://cdn.example.com/logo.png',
+    description: 'Store logo URL',
+  })
   @IsOptional()
   @IsString()
   logoUrl?: string;
 
-  @ApiPropertyOptional({ example: 'https://cdn.example.com/banner.png', description: 'Store banner URL' })
+  @ApiPropertyOptional({
+    example: 'https://cdn.example.com/banner.png',
+    description: 'Store banner URL',
+  })
   @IsOptional()
   @IsString()
   bannerUrl?: string;
@@ -60,12 +69,18 @@ export class CreateStoreDto {
   @IsString()
   address?: string;
 
-  @ApiPropertyOptional({ example: '14-day return policy for unused items', description: 'Return policy text' })
+  @ApiPropertyOptional({
+    example: '14-day return policy for unused items',
+    description: 'Return policy text',
+  })
   @IsOptional()
   @IsString()
   returnPolicy?: string;
 
-  @ApiPropertyOptional({ example: 'Express shipping within 48 hours across Egypt', description: 'Shipping policy text' })
+  @ApiPropertyOptional({
+    example: 'Express shipping within 48 hours across Egypt',
+    description: 'Shipping policy text',
+  })
   @IsOptional()
   @IsString()
   shippingPolicy?: string;

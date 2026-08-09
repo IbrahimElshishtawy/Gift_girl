@@ -20,7 +20,10 @@ export class UploadDocumentDto {
   @IsNotEmpty()
   fileReference!: string;
 
-  @ApiPropertyOptional({ example: 'Business_License_2026.pdf', description: 'Original document file name' })
+  @ApiPropertyOptional({
+    example: 'Business_License_2026.pdf',
+    description: 'Original document file name',
+  })
   @IsOptional()
   @IsString()
   fileName?: string;

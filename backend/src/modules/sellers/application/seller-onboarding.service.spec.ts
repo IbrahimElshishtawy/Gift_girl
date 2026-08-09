@@ -6,7 +6,12 @@ import { SellerDocumentsRepository } from '../infrastructure/seller-documents.re
 import { SellersRepository } from '../infrastructure/sellers.repository';
 import { RbacService } from '../../rbac/application/rbac.service';
 import { SecurityAuditService } from '../../auth/infrastructure/security-audit.service';
-import { SellerApplicationStatus, SellerStatus, SellerVerificationStatus, SellerDocumentStatus } from '@prisma/client';
+import {
+  SellerApplicationStatus,
+  SellerStatus,
+  SellerVerificationStatus,
+  SellerDocumentStatus,
+} from '@prisma/client';
 
 describe('SellerOnboardingService', () => {
   let service: SellerOnboardingService;
@@ -52,30 +57,65 @@ describe('SellerOnboardingService', () => {
   };
 
   const mockPrismaService = {
-    $transaction: jest.fn().mockImplementation(async (cb) => cb({
-      seller: {
-        findUnique: jest.fn().mockResolvedValue(null),
-        create: jest.fn().mockResolvedValue(mockSeller),
-        update: jest.fn().mockResolvedValue(mockSeller),
-      },
-      sellerApplication: {
-        update: jest.fn().mockResolvedValue({ ...mockApp, status: SellerApplicationStatus.APPROVED, sellerId: 'sel_1' }),
-      },
-    })),
+    $transaction: jest.fn().mockImplementation(async (cb) =>
+      cb({
+        seller: {
+          findUnique: jest.fn().mockResolvedValue(null),
+          create: jest.fn().mockResolvedValue(mockSeller),
+          update: jest.fn().mockResolvedValue(mockSeller),
+        },
+        sellerApplication: {
+          update: jest.fn().mockResolvedValue({
+            ...mockApp,
+            status: SellerApplicationStatus.APPROVED,
+            sellerId: 'sel_1',
+          }),
+        },
+      }),
+    ),
   };
 
   const mockAppsRepo = {
     findById: jest.fn().mockResolvedValue(mockApp),
     findLatestByUserId: jest.fn().mockResolvedValue(null),
     create: jest.fn().mockResolvedValue(mockApp),
-    updateStatus: jest.fn().mockResolvedValue({ ...mockApp, status: SellerApplicationStatus.REJECTED }),
+    updateStatus: jest
+      .fn()
+      .mockResolvedValue({ ...mockApp, status: SellerApplicationStatus.REJECTED }),
   };
 
   const mockDocsRepo = {
-    findById: jest.fn().mockResolvedValue({ id: 'doc_1', sellerId: 'sel_1', type: 'BUSINESS_LICENSE', status: 'PENDING' }),
+    findById: jest.fn().mockResolvedValue({
+      id: 'doc_1',
+      sellerId: 'sel_1',
+      type: 'BUSINESS_LICENSE',
+      status: 'PENDING',
+    }),
     findBySellerId: jest.fn().mockResolvedValue([]),
-    create: jest.fn().mockResolvedValue({ id: 'doc_1', sellerId: 'sel_1', type: 'BUSINESS_LICENSE', status: 'PENDING', fileReference: 'ref_1', fileName: null, rejectionReason: null, uploadedAt: new Date(), reviewedAt: null, reviewedByUserId: null }),
-    updateStatus: jest.fn().mockResolvedValue({ id: 'doc_1', sellerId: 'sel_1', type: 'BUSINESS_LICENSE', status: SellerDocumentStatus.VERIFIED, fileReference: 'ref_1', fileName: null, rejectionReason: null, uploadedAt: new Date(), reviewedAt: new Date(), reviewedByUserId: 'admin_1' }),
+    create: jest.fn().mockResolvedValue({
+      id: 'doc_1',
+      sellerId: 'sel_1',
+      type: 'BUSINESS_LICENSE',
+      status: 'PENDING',
+      fileReference: 'ref_1',
+      fileName: null,
+      rejectionReason: null,
+      uploadedAt: new Date(),
+      reviewedAt: null,
+      reviewedByUserId: null,
+    }),
+    updateStatus: jest.fn().mockResolvedValue({
+      id: 'doc_1',
+      sellerId: 'sel_1',
+      type: 'BUSINESS_LICENSE',
+      status: SellerDocumentStatus.VERIFIED,
+      fileReference: 'ref_1',
+      fileName: null,
+      rejectionReason: null,
+      uploadedAt: new Date(),
+      reviewedAt: new Date(),
+      reviewedByUserId: 'admin_1',
+    }),
   };
 
   const mockSellersRepo = {

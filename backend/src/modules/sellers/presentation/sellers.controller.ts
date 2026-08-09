@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Body,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard';
 import { CurrentUser } from '../../auth/presentation/decorators/current-user.decorator';
@@ -30,10 +22,7 @@ export class SellersController {
   @Post('apply')
   @ApiOperation({ summary: 'Submit a new seller onboarding application' })
   @ApiResponse({ status: 201, description: 'Application submitted successfully' })
-  async applyForSeller(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: ApplySellerDto,
-  ) {
+  async applyForSeller(@CurrentUser() user: AuthenticatedUser, @Body() dto: ApplySellerDto) {
     return this.onboardingService.applyForSeller(user.id, dto);
   }
 
@@ -68,10 +57,7 @@ export class SellersController {
   @Post('me/documents')
   @ApiOperation({ summary: 'Upload verification document for seller onboarding' })
   @ApiResponse({ status: 201, description: 'Document record created successfully' })
-  async uploadDocument(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: UploadDocumentDto,
-  ) {
+  async uploadDocument(@CurrentUser() user: AuthenticatedUser, @Body() dto: UploadDocumentDto) {
     return this.onboardingService.uploadDocument(user.id, dto);
   }
 }

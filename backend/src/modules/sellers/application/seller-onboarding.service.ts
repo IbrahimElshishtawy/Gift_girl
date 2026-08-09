@@ -91,10 +91,7 @@ export class SellerOnboardingService {
     return SellerApplicationEntity.fromPrisma(app);
   }
 
-  async uploadDocument(
-    userId: string,
-    data: UploadDocumentData,
-  ): Promise<SellerDocumentEntity> {
+  async uploadDocument(userId: string, data: UploadDocumentData): Promise<SellerDocumentEntity> {
     const seller = await this.sellersRepository.findByUserId(userId);
     if (!seller) {
       throw new ForbiddenException(
@@ -141,9 +138,7 @@ export class SellerOnboardingService {
       app.status !== SellerApplicationStatus.SUBMITTED &&
       app.status !== SellerApplicationStatus.UNDER_REVIEW
     ) {
-      throw new BadRequestException(
-        `Application cannot be approved from status '${app.status}'.`,
-      );
+      throw new BadRequestException(`Application cannot be approved from status '${app.status}'.`);
     }
 
     // Atomic transaction: Seller creation + Application status update + RBAC role assignment

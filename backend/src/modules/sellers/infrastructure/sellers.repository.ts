@@ -22,11 +22,7 @@ export class SellersRepository {
     return this.prisma.seller.update({ where: { id }, data });
   }
 
-  async updateStatus(
-    id: string,
-    status: SellerStatus,
-    rejectionReason?: string,
-  ): Promise<Seller> {
+  async updateStatus(id: string, status: SellerStatus, rejectionReason?: string): Promise<Seller> {
     const data: Prisma.SellerUpdateInput = {
       status,
       ...(rejectionReason ? { rejectionReason } : {}),

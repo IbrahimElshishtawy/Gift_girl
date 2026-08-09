@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma.service';
-import { Store, Prisma, StoreStatus } from '@prisma/client';
+import { Store, Seller, Prisma, StoreStatus } from '@prisma/client';
 
 @Injectable()
 export class StoresRepository {
@@ -14,7 +14,7 @@ export class StoresRepository {
     return this.prisma.store.findFirst({ where: { sellerId } });
   }
 
-  async findBySlug(slug: string): Promise<Store | null> {
+  async findBySlug(slug: string): Promise<(Store & { seller: Seller }) | null> {
     return this.prisma.store.findUnique({
       where: { slug: slug.toLowerCase() },
       include: {
@@ -36,11 +36,7 @@ export class StoresRepository {
     return this.prisma.store.update({ where: { id }, data });
   }
 
-  async updateStatus(
-    id: string,
-    status: StoreStatus,
-    rejectionReason?: string,
-  ): Promise<Store> {
+  async updateStatus(id: string, status: StoreStatus, rejectionReason?: string): Promise<Store> {
     return this.prisma.store.update({
       where: { id },
       data: {

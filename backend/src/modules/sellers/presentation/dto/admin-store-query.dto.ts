@@ -24,7 +24,10 @@ export class AdminStoreQueryDto {
   @IsEnum(StoreStatus)
   status?: StoreStatus;
 
-  @ApiPropertyOptional({ example: 'lotus', description: 'Search by store name, slug, or contact email' })
+  @ApiPropertyOptional({
+    example: 'lotus',
+    description: 'Search by store name, slug, or contact email',
+  })
   @IsOptional()
   @IsString()
   search?: string;

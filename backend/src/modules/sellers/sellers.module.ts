@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../../database/prisma.module';
+import { DatabaseModule } from '../../database/database.module';
 import { RbacModule } from '../rbac/rbac.module';
 import { AuthModule } from '../auth/auth.module';
 
@@ -24,7 +24,7 @@ import { AdminStoresController } from './presentation/admin-stores.controller';
 import { PublicStoresController } from './presentation/public-stores.controller';
 
 @Module({
-  imports: [PrismaModule, RbacModule, AuthModule],
+  imports: [DatabaseModule, RbacModule, AuthModule],
   providers: [
     SellersRepository,
     SellerApplicationsRepository,
