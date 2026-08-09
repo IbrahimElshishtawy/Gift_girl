@@ -9,6 +9,7 @@ import { CorrelationIdMiddleware } from './common/middleware/correlation-id.midd
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { RbacModule } from './modules/rbac/rbac.module';
+import { SellersModule } from './modules/sellers/sellers.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RbacModule } from './modules/rbac/rbac.module';
     RbacModule,
     UsersModule,
     AuthModule,
+    SellersModule,
   ],
 })
 export class AppModule implements NestModule {
