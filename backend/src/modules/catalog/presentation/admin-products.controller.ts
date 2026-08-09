@@ -37,7 +37,7 @@ export class ApproveProductDto {
 @ApiTags('Admin / Products')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, PermissionsGuard)
-@Controller('api/admin/products')
+@Controller('admin/products')
 export class AdminProductsController {
   constructor(private readonly productsAdminService: ProductsAdminService) {}
 

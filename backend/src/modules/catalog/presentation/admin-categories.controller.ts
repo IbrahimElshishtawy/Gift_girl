@@ -29,7 +29,7 @@ type AuthenticatedRequest = AppRequest & { user: { id: string } };
 @ApiTags('Admin / Categories')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, PermissionsGuard)
-@Controller('api/admin/categories')
+@Controller('admin/categories')
 export class AdminCategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 

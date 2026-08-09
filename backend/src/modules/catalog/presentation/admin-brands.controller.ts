@@ -15,7 +15,7 @@ type AuthenticatedRequest = AppRequest & { user: { id: string } };
 @ApiTags('Admin / Brands')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, PermissionsGuard)
-@Controller('api/admin/brands')
+@Controller('admin/brands')
 export class AdminBrandsController {
   constructor(private readonly brandsService: BrandsService) {}
 

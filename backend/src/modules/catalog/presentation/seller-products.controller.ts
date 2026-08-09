@@ -22,6 +22,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateVariantDto } from './dto/create-variant.dto';
 import { CreateOptionDto } from './dto/create-option.dto';
 import { AddMediaDto } from './dto/add-media.dto';
+import { AdminProductQueryDto } from './dto/admin-product-query.dto';
 import { AppRequest } from '../../../common/types/request-context.interface';
 
 type AuthenticatedRequest = AppRequest & { user: { id: string } };
@@ -29,7 +30,7 @@ type AuthenticatedRequest = AppRequest & { user: { id: string } };
 @ApiTags('Seller / Products')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, PermissionsGuard)
-@Controller('api/sellers/me/products')
+@Controller('sellers/me/products')
 export class SellerProductsController {
   constructor(private readonly sellerProductsService: ProductsSellerService) {}
 

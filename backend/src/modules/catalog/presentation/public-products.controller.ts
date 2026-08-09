@@ -4,7 +4,7 @@ import { ProductsPublicService } from '../application/products-public.service';
 import { PublicProductQueryDto } from './dto/public-product-query.dto';
 
 @ApiTags('Public / Products')
-@Controller('api/products')
+@Controller('products')
 export class PublicProductsController {
   constructor(private readonly productsPublicService: ProductsPublicService) {}
 
