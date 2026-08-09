@@ -61,6 +61,75 @@ enum SecurityEventType {
   ROLE_ASSIGNED
   PERMISSION_ASSIGNED
   ACCOUNT_STATUS_CHANGE
+  SELLER_APPLICATION_CREATED
+  SELLER_APPLICATION_UPDATED
+  SELLER_APPROVED
+  SELLER_REJECTED
+  SELLER_SUSPENDED
+  SELLER_ACTIVATED
+  SELLER_DISABLED
+  STORE_CREATED
+  STORE_UPDATED
+  STORE_SUBMITTED
+  STORE_APPROVED
+  STORE_SUSPENDED
+  STORE_ACTIVATED
+  SELLER_STAFF_ADDED
+  SELLER_STAFF_REMOVED
+  SELLER_STAFF_UPDATED
+  SELLER_DOCUMENT_UPLOADED
+  SELLER_DOCUMENT_REVIEWED
+}
+
+enum SellerStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+  DISABLED
+}
+
+enum SellerVerificationStatus {
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+enum SellerApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum StoreStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  SUSPENDED
+  DISABLED
+  CLOSED
+}
+
+enum SellerDocumentType {
+  BUSINESS_LICENSE
+  IDENTITY_DOCUMENT
+  TAX_DOCUMENT
+  BANK_DOCUMENT
+}
+
+enum SellerDocumentStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum SellerStaffStatus {
+  ACTIVE
+  SUSPENDED
+  REMOVED
 }
 
 model User {
@@ -88,6 +157,9 @@ model User {
   passwordResetTokens PasswordResetToken[]
   verificationTokens  VerificationToken[]
   securityAuditEvents SecurityAuditEvent[]
+  seller              Seller?
+  sellerApplications  SellerApplication[]
+  staffRoles          SellerStaff[]
 
   @@index([email])
   @@index([phone])
@@ -276,4 +348,125 @@ model SecurityAuditEvent {
   @@index([userId])
   @@index([event])
   @@map("security_audit_events")
+}
+
+model Seller {
+  id                 String                   @id @default(uuid())
+  userId             String                   @unique
+  user               User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessName       String
+  legalName          String?
+  description        String?
+  phone              String
+  email              String
+  country            String                   @default("Egypt")
+  governorateState   String
+  city               String
+  address            String
+  status             SellerStatus             @default(PENDING)
+  verificationStatus SellerVerificationStatus @default(PENDING)
+  rejectionReason    String?
+  approvedAt         DateTime?
+  suspendedAt        DateTime?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  applications       SellerApplication[]
+  documents          SellerDocument[]
+  stores             Store[]
+  staff              SellerStaff[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([verificationStatus])
+  @@map("sellers")
+}
+
+model SellerApplication {
+  id                 String                  @id @default(uuid())
+  userId             String
+  user               User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sellerId           String?
+  seller             Seller?                 @relation(fields: [sellerId], references: [id], onDelete: SetNull)
+  businessName       String
+  businessType       String?
+  taxNumber          String?
+  commercialRegister String?
+  contactPhone       String
+  contactEmail       String
+  notes              String?
+  status             SellerApplicationStatus @default(SUBMITTED)
+  rejectionReason    String?
+  reviewedByUserId   String?
+  reviewedAt         DateTime?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  @@index([userId])
+  @@index([sellerId])
+  @@index([status])
+  @@map("seller_applications")
+}
+
+model SellerDocument {
+  id               String               @id @default(uuid())
+  sellerId         String
+  seller           Seller               @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  type             SellerDocumentType
+  fileReference    String
+  fileName         String?
+  status           SellerDocumentStatus @default(PENDING)
+  rejectionReason  String?
+  uploadedAt       DateTime             @default(now())
+  reviewedAt       DateTime?
+  reviewedByUserId String?
+
+  @@index([sellerId])
+  @@index([status])
+  @@map("seller_documents")
+}
+
+model Store {
+  id               String      @id @default(uuid())
+  sellerId         String
+  seller           Seller      @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  name             String
+  slug             String      @unique
+  description      String?
+  logoUrl          String?
+  bannerUrl        String?
+  status           StoreStatus @default(DRAFT)
+  contactEmail     String
+  contactPhone     String
+  country          String      @default("Egypt")
+  governorateState String
+  city             String
+  address          String?
+  returnPolicy     String?
+  shippingPolicy   String?
+  rejectionReason  String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@index([sellerId])
+  @@index([status])
+  @@index([slug])
+  @@map("stores")
+}
+
+model SellerStaff {
+  id        String            @id @default(uuid())
+  sellerId  String
+  seller    Seller            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String            @default("STAFF")
+  status    SellerStaffStatus @default(ACTIVE)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@unique([sellerId, userId])
+  @@index([sellerId])
+  @@index([userId])
+  @@map("seller_staff")
 }
