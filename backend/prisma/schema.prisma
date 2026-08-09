@@ -79,6 +79,28 @@ enum SecurityEventType {
   SELLER_STAFF_UPDATED
   SELLER_DOCUMENT_UPLOADED
   SELLER_DOCUMENT_REVIEWED
+  CATEGORY_CREATED
+  CATEGORY_UPDATED
+  CATEGORY_DELETED
+  CATEGORY_ACTIVATED
+  CATEGORY_DEACTIVATED
+  BRAND_CREATED
+  BRAND_UPDATED
+  BRAND_DELETED
+  PRODUCT_CREATED
+  PRODUCT_UPDATED
+  PRODUCT_SUBMITTED
+  PRODUCT_APPROVED
+  PRODUCT_REJECTED
+  PRODUCT_PUBLISHED
+  PRODUCT_ARCHIVED
+  PRODUCT_DELETED
+  PRODUCT_VARIANT_CREATED
+  PRODUCT_VARIANT_UPDATED
+  PRODUCT_VARIANT_DELETED
+  PRODUCT_MEDIA_ADDED
+  PRODUCT_MEDIA_UPDATED
+  PRODUCT_MEDIA_DELETED
 }
 
 enum SellerStatus {
@@ -448,6 +470,8 @@ model Store {
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 
+  products         Product[]
+
   @@index([sellerId])
   @@index([status])
   @@index([slug])
@@ -469,4 +493,209 @@ model SellerStaff {
   @@index([sellerId])
   @@index([userId])
   @@map("seller_staff")
+}
+
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum BrandStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum ProductStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ProductVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum ProductMediaType {
+  IMAGE
+  VIDEO
+}
+
+model Category {
+  id          String         @id @default(uuid())
+  name        String
+  slug        String         @unique
+  description String?
+  imageUrl    String?
+  parentId    String?
+  parent      Category?      @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children    Category[]     @relation("CategoryHierarchy")
+  status      CategoryStatus @default(ACTIVE)
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  products    Product[]
+
+  @@index([parentId])
+  @@index([status])
+  @@index([slug])
+  @@map("categories")
+}
+
+model Brand {
+  id          String      @id @default(uuid())
+  name        String
+  slug        String      @unique
+  logoUrl     String?
+  description String?
+  status      BrandStatus @default(ACTIVE)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  products    Product[]
+
+  @@index([status])
+  @@index([slug])
+  @@map("brands")
+}
+
+model Product {
+  id               String            @id @default(uuid())
+  storeId          String
+  store            Store             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  categoryId       String
+  category         Category          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  brandId          String?
+  brand            Brand?            @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  name             String
+  slug             String
+  shortDescription String?
+  description      String?
+  status           ProductStatus     @default(DRAFT)
+  visibility       ProductVisibility @default(PUBLIC)
+  basePrice        Decimal           @db.Decimal(10, 2)
+  compareAtPrice   Decimal?          @db.Decimal(10, 2)
+  currency         String            @default("EGP")
+  rejectionReason  String?
+  publishedAt      DateTime?
+  archivedAt       DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  options          ProductOption[]
+  variants         ProductVariant[]
+  attributes       ProductAttribute[]
+  media            ProductMedia[]
+
+  @@unique([storeId, slug])
+  @@index([storeId])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([status])
+  @@index([visibility])
+  @@index([status, visibility])
+  @@index([createdAt])
+  @@map("products")
+}
+
+model ProductOption {
+  id        String               @id @default(uuid())
+  productId String
+  product   Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  position  Int                  @default(0)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  values    ProductOptionValue[]
+
+  @@unique([productId, name])
+  @@index([productId])
+  @@map("product_options")
+}
+
+model ProductOptionValue {
+  id            String                      @id @default(uuid())
+  optionId      String
+  option        ProductOption               @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  value         String
+  position      Int                         @default(0)
+  createdAt     DateTime                    @default(now())
+  updatedAt     DateTime                    @updatedAt
+
+  variantValues ProductVariantOptionValue[]
+
+  @@unique([optionId, value])
+  @@index([optionId])
+  @@map("product_option_values")
+}
+
+model ProductVariant {
+  id                     String                      @id @default(uuid())
+  productId              String
+  product                Product                     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku                    String                      @unique
+  price                  Decimal?                    @db.Decimal(10, 2)
+  compareAtPrice         Decimal?                    @db.Decimal(10, 2)
+  optionCombinationHash String?
+  isDefault              Boolean                     @default(false)
+  status                 String                      @default("ACTIVE")
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+
+  optionValues           ProductVariantOptionValue[]
+
+  @@unique([productId, optionCombinationHash])
+  @@index([productId])
+  @@index([sku])
+  @@map("product_variants")
+}
+
+model ProductVariantOptionValue {
+  variantId     String
+  optionValueId String
+
+  variant       ProductVariant     @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  optionValue   ProductOptionValue @relation(fields: [optionValueId], references: [id], onDelete: Cascade)
+
+  @@id([variantId, optionValueId])
+  @@index([variantId])
+  @@index([optionValueId])
+  @@map("product_variant_option_values")
+}
+
+model ProductAttribute {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  key       String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, key])
+  @@index([productId])
+  @@map("product_attributes")
+}
+
+model ProductMedia {
+  id        String           @id @default(uuid())
+  productId String
+  product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  type      ProductMediaType @default(IMAGE)
+  url       String
+  altText   String?
+  sortOrder Int              @default(0)
+  isPrimary Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([productId])
+  @@map("product_media")
 }

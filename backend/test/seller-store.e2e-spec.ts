@@ -115,10 +115,23 @@ describe('Seller & Store Domain Module (e2e)', () => {
         if (include?.roleAssignments || select?.roleAssignments) {
           res.roleAssignments = mockUserRoles
             .filter((ur: Record<string, unknown>) => ur.userId === found.id)
-            .map((ur: Record<string, unknown>) => ({
-              ...ur,
-              role: mockRoles.find((r: Record<string, unknown>) => r.id === ur.roleId),
-            }));
+            .map((ur: Record<string, unknown>) => {
+              const roleObj = mockRoles.find((r: Record<string, unknown>) => r.id === ur.roleId);
+              const rPermissions = roleObj
+                ? mockRolePermissions
+                    .filter((rp: Record<string, unknown>) => rp.roleId === roleObj.id)
+                    .map((rp: Record<string, unknown>) => ({
+                      ...rp,
+                      permission: mockPermissions.find(
+                        (p: Record<string, unknown>) => p.id === rp.permissionId,
+                      ),
+                    }))
+                : [];
+              return {
+                ...ur,
+                role: roleObj ? { ...roleObj, rolePermissions: rPermissions } : null,
+              };
+            });
         }
         return Promise.resolve(res);
       }),
@@ -581,9 +594,11 @@ describe('Seller & Store Domain Module (e2e)', () => {
   it('POST /api/sellers/me/store/submit - Seller submits store for admin review', async () => {
     const res = await request(app.getHttpServer())
       .post('/api/sellers/me/store/submit')
-      .set('Authorization', `Bearer ${customer1Token}`)
-      .expect(201);
-
+      .set('Authorization', `Bearer ${customer1Token}`);
+    if (res.status !== 201) {
+      console.log('SUBMIT STORE ERROR RESPONSE:', res.status, res.body);
+    }
+    expect(res.status).toBe(201);
     expect(res.body.status).toBe('PENDING_REVIEW');
   });
 
