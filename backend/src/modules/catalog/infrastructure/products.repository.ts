@@ -44,10 +44,7 @@ export class ProductsRepository {
     });
   }
 
-  async findByStoreAndSlug(
-    storeId: string,
-    slug: string,
-  ): Promise<ProductWithRelations | null> {
+  async findByStoreAndSlug(storeId: string, slug: string): Promise<ProductWithRelations | null> {
     return this.prisma.product.findUnique({
       where: {
         storeId_slug: {
@@ -131,11 +128,7 @@ export class ProductsRepository {
     });
   }
 
-  async updateStatus(
-    id: string,
-    status: ProductStatus,
-    reason?: string,
-  ): Promise<Product> {
+  async updateStatus(id: string, status: ProductStatus, reason?: string): Promise<Product> {
     const data: Prisma.ProductUpdateInput = { status };
     if (status === ProductStatus.REJECTED) {
       data.rejectionReason = reason || 'Rejected by administrator';

@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { BrandsRepository } from '../infrastructure/brands.repository';
 import { SecurityAuditService } from '../../auth/infrastructure/security-audit.service';
 import { BrandEntity } from '../domain/brand.entity';

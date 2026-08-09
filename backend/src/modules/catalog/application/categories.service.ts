@@ -187,9 +187,12 @@ export class CategoriesService {
       imageUrl: data.imageUrl !== undefined ? data.imageUrl.trim() || null : undefined,
       sortOrder: data.sortOrder,
       status: data.status,
-      parent: data.parentId !== undefined
-        ? data.parentId ? { connect: { id: data.parentId } } : { disconnect: true }
-        : undefined,
+      parent:
+        data.parentId !== undefined
+          ? data.parentId
+            ? { connect: { id: data.parentId } }
+            : { disconnect: true }
+          : undefined,
     });
 
     await this.securityAuditService.logEvent(
@@ -215,9 +218,10 @@ export class CategoriesService {
 
     const updated = await this.categoriesRepository.updateStatus(id, status);
 
-    const event = status === CategoryStatus.ACTIVE
-      ? SecurityEventType.CATEGORY_ACTIVATED
-      : SecurityEventType.CATEGORY_DEACTIVATED;
+    const event =
+      status === CategoryStatus.ACTIVE
+        ? SecurityEventType.CATEGORY_ACTIVATED
+        : SecurityEventType.CATEGORY_DEACTIVATED;
 
     await this.securityAuditService.logEvent(event, adminUserId, ipAddress, userAgent, {
       categoryId: id,
@@ -242,7 +246,9 @@ export class CategoriesService {
 
     const productCount = await this.categoriesRepository.countProductsInCategory(id);
     if (productCount > 0) {
-      throw new BadRequestException(`Cannot delete category with ${productCount} assigned products.`);
+      throw new BadRequestException(
+        `Cannot delete category with ${productCount} assigned products.`,
+      );
     }
 
     await this.categoriesRepository.delete(id);

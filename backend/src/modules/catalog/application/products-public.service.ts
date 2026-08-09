@@ -1,7 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductsRepository } from '../infrastructure/products.repository';
 import { ProductEntity } from '../domain/product.entity';
-import { ProductStatus, ProductVisibility, CategoryStatus, SellerStatus, StoreStatus, Prisma } from '@prisma/client';
+import {
+  ProductStatus,
+  ProductVisibility,
+  CategoryStatus,
+  SellerStatus,
+  StoreStatus,
+  Prisma,
+} from '@prisma/client';
 
 export interface PublicProductQueryParams {
   page?: number;

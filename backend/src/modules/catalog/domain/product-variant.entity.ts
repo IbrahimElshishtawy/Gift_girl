@@ -39,9 +39,7 @@ export class ProductVariantEntity {
       prisma.createdAt,
       prisma.updatedAt,
       prisma.optionValues
-        ? prisma.optionValues.map((ov) =>
-            ProductOptionValueEntity.fromPrisma(ov.optionValue),
-          )
+        ? prisma.optionValues.map((ov) => ProductOptionValueEntity.fromPrisma(ov.optionValue))
         : undefined,
     );
   }

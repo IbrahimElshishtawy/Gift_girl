@@ -8,12 +8,18 @@ export class UpdateCategoryDto {
   @IsString()
   name?: string;
 
-  @ApiPropertyOptional({ example: 'Updated description', description: 'Updated category description' })
+  @ApiPropertyOptional({
+    example: 'Updated description',
+    description: 'Updated category description',
+  })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ example: 'https://cdn.example.com/summer-dresses.png', description: 'Updated image URL' })
+  @ApiPropertyOptional({
+    example: 'https://cdn.example.com/summer-dresses.png',
+    description: 'Updated image URL',
+  })
   @IsOptional()
   @IsString()
   imageUrl?: string;

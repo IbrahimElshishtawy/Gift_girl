@@ -46,9 +46,7 @@ export class ProductOptionEntity {
       prisma.position,
       prisma.createdAt,
       prisma.updatedAt,
-      prisma.values
-        ? prisma.values.map(ProductOptionValueEntity.fromPrisma)
-        : [],
+      prisma.values ? prisma.values.map(ProductOptionValueEntity.fromPrisma) : [],
     );
   }
 }

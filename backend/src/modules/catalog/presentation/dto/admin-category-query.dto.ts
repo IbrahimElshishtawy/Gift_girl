@@ -24,7 +24,10 @@ export class AdminCategoryQueryDto {
   @IsEnum(CategoryStatus)
   status?: CategoryStatus;
 
-  @ApiPropertyOptional({ example: 'null', description: 'Filter by parent ID ("null" for root categories)' })
+  @ApiPropertyOptional({
+    example: 'null',
+    description: 'Filter by parent ID ("null" for root categories)',
+  })
   @IsOptional()
   @IsString()
   parentId?: string;

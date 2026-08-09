@@ -15,9 +15,7 @@ export class CategoryEntity {
     public readonly children?: CategoryEntity[],
   ) {}
 
-  static fromPrisma(
-    prisma: PrismaCategory & { children?: PrismaCategory[] },
-  ): CategoryEntity {
+  static fromPrisma(prisma: PrismaCategory & { children?: PrismaCategory[] }): CategoryEntity {
     return new CategoryEntity(
       prisma.id,
       prisma.name,

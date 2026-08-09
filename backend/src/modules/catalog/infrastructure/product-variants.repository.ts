@@ -40,7 +40,11 @@ export class ProductVariantsRepository {
     });
   }
 
-  async createOptionValue(optionId: string, value: string, position = 0): Promise<ProductOptionValue> {
+  async createOptionValue(
+    optionId: string,
+    value: string,
+    position = 0,
+  ): Promise<ProductOptionValue> {
     return this.prisma.productOptionValue.create({
       data: {
         optionId,
@@ -84,10 +88,7 @@ export class ProductVariantsRepository {
     });
   }
 
-  async updateVariant(
-    id: string,
-    data: Prisma.ProductVariantUpdateInput,
-  ): Promise<ProductVariant> {
+  async updateVariant(id: string, data: Prisma.ProductVariantUpdateInput): Promise<ProductVariant> {
     return this.prisma.productVariant.update({
       where: { id },
       data,

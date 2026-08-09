@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ProductsRepository } from '../infrastructure/products.repository';
 import { SecurityAuditService } from '../../auth/infrastructure/security-audit.service';
 import { ProductEntity } from '../domain/product.entity';
@@ -91,22 +87,18 @@ export class ProductsAdminService {
     const product = await this.productsRepository.findById(productId);
     if (!product) throw new NotFoundException('Product not found.');
 
-    if (
-      product.status !== ProductStatus.PENDING_REVIEW &&
-      product.status !== ProductStatus.DRAFT
-    ) {
+    if (product.status !== ProductStatus.PENDING_REVIEW && product.status !== ProductStatus.DRAFT) {
       throw new BadRequestException(`Product cannot be approved from status '${product.status}'.`);
     }
 
-    const targetStatus = publishImmediately
-      ? ProductStatus.PUBLISHED
-      : ProductStatus.APPROVED;
+    const targetStatus = publishImmediately ? ProductStatus.PUBLISHED : ProductStatus.APPROVED;
 
     const updated = await this.productsRepository.updateStatus(productId, targetStatus);
 
-    const event = targetStatus === ProductStatus.PUBLISHED
-      ? SecurityEventType.PRODUCT_PUBLISHED
-      : SecurityEventType.PRODUCT_APPROVED;
+    const event =
+      targetStatus === ProductStatus.PUBLISHED
+        ? SecurityEventType.PRODUCT_PUBLISHED
+        : SecurityEventType.PRODUCT_APPROVED;
 
     await this.securityAuditService.logEvent(event, adminUserId, ipAddress, userAgent, {
       productId,
@@ -155,10 +147,7 @@ export class ProductsAdminService {
     const product = await this.productsRepository.findById(productId);
     if (!product) throw new NotFoundException('Product not found.');
 
-    const updated = await this.productsRepository.updateStatus(
-      productId,
-      ProductStatus.ARCHIVED,
-    );
+    const updated = await this.productsRepository.updateStatus(productId, ProductStatus.ARCHIVED);
 
     await this.securityAuditService.logEvent(
       SecurityEventType.PRODUCT_ARCHIVED,

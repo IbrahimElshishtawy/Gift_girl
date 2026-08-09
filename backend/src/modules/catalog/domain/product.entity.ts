@@ -81,18 +81,10 @@ export class ProductEntity {
       prisma.updatedAt,
       prisma.category ? CategoryEntity.fromPrisma(prisma.category) : undefined,
       prisma.brand ? BrandEntity.fromPrisma(prisma.brand) : undefined,
-      prisma.options
-        ? prisma.options.map(ProductOptionEntity.fromPrisma)
-        : undefined,
-      prisma.variants
-        ? prisma.variants.map(ProductVariantEntity.fromPrisma)
-        : undefined,
-      prisma.attributes
-        ? prisma.attributes.map(ProductAttributeEntity.fromPrisma)
-        : undefined,
-      prisma.media
-        ? prisma.media.map(ProductMediaEntity.fromPrisma)
-        : undefined,
+      prisma.options ? prisma.options.map(ProductOptionEntity.fromPrisma) : undefined,
+      prisma.variants ? prisma.variants.map(ProductVariantEntity.fromPrisma) : undefined,
+      prisma.attributes ? prisma.attributes.map(ProductAttributeEntity.fromPrisma) : undefined,
+      prisma.media ? prisma.media.map(ProductMediaEntity.fromPrisma) : undefined,
     );
   }
 }

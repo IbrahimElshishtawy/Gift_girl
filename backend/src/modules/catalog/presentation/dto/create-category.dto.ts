@@ -20,12 +20,18 @@ export class CreateCategoryDto {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ example: 'https://cdn.example.com/dresses.png', description: 'Category banner/icon image URL' })
+  @ApiPropertyOptional({
+    example: 'https://cdn.example.com/dresses.png',
+    description: 'Category banner/icon image URL',
+  })
   @IsOptional()
   @IsString()
   imageUrl?: string;
 
-  @ApiPropertyOptional({ example: 'cat_clothing_123', description: 'Parent category UUID if subcategory' })
+  @ApiPropertyOptional({
+    example: 'cat_clothing_123',
+    description: 'Parent category UUID if subcategory',
+  })
   @IsOptional()
   @IsString()
   parentId?: string;

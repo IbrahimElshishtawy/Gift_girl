@@ -8,12 +8,18 @@ export class UpdateBrandDto {
   @IsString()
   name?: string;
 
-  @ApiPropertyOptional({ example: 'https://cdn.example.com/chanel-logo.png', description: 'Updated logo URL' })
+  @ApiPropertyOptional({
+    example: 'https://cdn.example.com/chanel-logo.png',
+    description: 'Updated logo URL',
+  })
   @IsOptional()
   @IsString()
   logoUrl?: string;
 
-  @ApiPropertyOptional({ example: 'High fashion and luxury beauty products', description: 'Updated brand description' })
+  @ApiPropertyOptional({
+    example: 'High fashion and luxury beauty products',
+    description: 'Updated brand description',
+  })
   @IsOptional()
   @IsString()
   description?: string;

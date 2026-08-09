@@ -1,13 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Matches,
-  Min,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Min } from 'class-validator';
 import { ProductVisibility } from '@prisma/client';
 
 export class CreateProductDto {
@@ -26,7 +18,10 @@ export class CreateProductDto {
   @IsNotEmpty()
   name!: string;
 
-  @ApiPropertyOptional({ example: 'floral-summer-maxi-dress', description: 'Store-unique product slug' })
+  @ApiPropertyOptional({
+    example: 'floral-summer-maxi-dress',
+    description: 'Store-unique product slug',
+  })
   @IsOptional()
   @IsString()
   @Matches(/^[a-z0-9-]+$/, {
@@ -34,12 +29,18 @@ export class CreateProductDto {
   })
   slug?: string;
 
-  @ApiPropertyOptional({ example: 'Lightweight handmade cotton dress', description: 'Short summary' })
+  @ApiPropertyOptional({
+    example: 'Lightweight handmade cotton dress',
+    description: 'Short summary',
+  })
   @IsOptional()
   @IsString()
   shortDescription?: string;
 
-  @ApiPropertyOptional({ example: '<p>Beautiful handcrafted dress with breathable cotton...</p>', description: 'Full description HTML' })
+  @ApiPropertyOptional({
+    example: '<p>Beautiful handcrafted dress with breathable cotton...</p>',
+    description: 'Full description HTML',
+  })
   @IsOptional()
   @IsString()
   description?: string;
@@ -60,7 +61,11 @@ export class CreateProductDto {
   @IsString()
   currency?: string;
 
-  @ApiPropertyOptional({ enum: ProductVisibility, example: ProductVisibility.PUBLIC, description: 'Product visibility' })
+  @ApiPropertyOptional({
+    enum: ProductVisibility,
+    example: ProductVisibility.PUBLIC,
+    description: 'Product visibility',
+  })
   @IsOptional()
   @IsEnum(ProductVisibility)
   visibility?: ProductVisibility;

@@ -206,7 +206,9 @@ export class ProductsSellerService {
     }
 
     if (data.compareAtPrice !== undefined && data.compareAtPrice < data.basePrice) {
-      throw new BadRequestException('Compare-at price must be greater than or equal to base price.');
+      throw new BadRequestException(
+        'Compare-at price must be greater than or equal to base price.',
+      );
     }
 
     const product = await this.productsRepository.create({
@@ -259,18 +261,25 @@ export class ProductsSellerService {
       throw new BadRequestException('Base price cannot be negative.');
     }
 
-    const effectiveBasePrice = data.basePrice !== undefined ? data.basePrice : Number(product.basePrice);
+    const effectiveBasePrice =
+      data.basePrice !== undefined ? data.basePrice : Number(product.basePrice);
     if (data.compareAtPrice !== undefined && data.compareAtPrice < effectiveBasePrice) {
-      throw new BadRequestException('Compare-at price must be greater than or equal to base price.');
+      throw new BadRequestException(
+        'Compare-at price must be greater than or equal to base price.',
+      );
     }
 
     const updated = await this.productsRepository.update(productId, {
       category: data.categoryId ? { connect: { id: data.categoryId } } : undefined,
-      brand: data.brandId !== undefined
-        ? data.brandId ? { connect: { id: data.brandId } } : { disconnect: true }
-        : undefined,
+      brand:
+        data.brandId !== undefined
+          ? data.brandId
+            ? { connect: { id: data.brandId } }
+            : { disconnect: true }
+          : undefined,
       name: data.name?.trim(),
-      shortDescription: data.shortDescription !== undefined ? data.shortDescription.trim() || null : undefined,
+      shortDescription:
+        data.shortDescription !== undefined ? data.shortDescription.trim() || null : undefined,
       description: data.description !== undefined ? this.sanitizeHtml(data.description) : undefined,
       basePrice: data.basePrice,
       compareAtPrice: data.compareAtPrice !== undefined ? data.compareAtPrice : undefined,
@@ -298,10 +307,7 @@ export class ProductsSellerService {
       throw new NotFoundException('Product not found in your store.');
     }
 
-    if (
-      product.status !== ProductStatus.DRAFT &&
-      product.status !== ProductStatus.REJECTED
-    ) {
+    if (product.status !== ProductStatus.DRAFT && product.status !== ProductStatus.REJECTED) {
       throw new BadRequestException(`Product cannot be submitted from status '${product.status}'.`);
     }
 
@@ -330,10 +336,7 @@ export class ProductsSellerService {
       throw new NotFoundException('Product not found in your store.');
     }
 
-    const updated = await this.productsRepository.updateStatus(
-      productId,
-      ProductStatus.ARCHIVED,
-    );
+    const updated = await this.productsRepository.updateStatus(productId, ProductStatus.ARCHIVED);
 
     await this.securityAuditService.logEvent(
       SecurityEventType.PRODUCT_ARCHIVED,
@@ -409,9 +412,14 @@ export class ProductsSellerService {
       );
 
       const fullVariant = await this.variantsRepository.findVariantById(variant.id);
-      return ProductVariantEntity.fromPrisma(fullVariant as any);
-    } catch (error: any) {
-      if (error?.code === 'P2002') {
+      return ProductVariantEntity.fromPrisma(fullVariant!);
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code: string }).code === 'P2002'
+      ) {
         throw new ConflictException('Duplicate variant option combination for this product.');
       }
       throw error;

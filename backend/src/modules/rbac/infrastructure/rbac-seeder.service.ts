@@ -207,6 +207,118 @@ export class RbacSeederService implements OnModuleInit {
           action: 'update',
           description: 'Update own store details',
         },
+        {
+          code: 'categories.read',
+          name: 'Read Categories',
+          resource: 'categories',
+          action: 'read',
+          description: 'View category tree and details',
+        },
+        {
+          code: 'categories.create',
+          name: 'Create Categories',
+          resource: 'categories',
+          action: 'create',
+          description: 'Create new catalog category',
+        },
+        {
+          code: 'categories.update',
+          name: 'Update Categories',
+          resource: 'categories',
+          action: 'update',
+          description: 'Update category details and status',
+        },
+        {
+          code: 'categories.delete',
+          name: 'Delete Categories',
+          resource: 'categories',
+          action: 'delete',
+          description: 'Delete empty categories',
+        },
+        {
+          code: 'brands.read',
+          name: 'Read Brands',
+          resource: 'brands',
+          action: 'read',
+          description: 'View marketplace brands',
+        },
+        {
+          code: 'brands.manage',
+          name: 'Manage Brands',
+          resource: 'brands',
+          action: 'manage',
+          description: 'Create and update marketplace brands',
+        },
+        {
+          code: 'products.read',
+          name: 'Read Products',
+          resource: 'products',
+          action: 'read',
+          description: 'View product details and listings',
+        },
+        {
+          code: 'products.create',
+          name: 'Create Products',
+          resource: 'products',
+          action: 'create',
+          description: 'Create store products',
+        },
+        {
+          code: 'products.update',
+          name: 'Update Products',
+          resource: 'products',
+          action: 'update',
+          description: 'Update product details and variants',
+        },
+        {
+          code: 'products.delete',
+          name: 'Delete Products',
+          resource: 'products',
+          action: 'delete',
+          description: 'Delete store products',
+        },
+        {
+          code: 'products.submit',
+          name: 'Submit Products',
+          resource: 'products',
+          action: 'submit',
+          description: 'Submit product for admin review',
+        },
+        {
+          code: 'products.review',
+          name: 'Review Products',
+          resource: 'products',
+          action: 'review',
+          description: 'Review pending products',
+        },
+        {
+          code: 'products.approve',
+          name: 'Approve Products',
+          resource: 'products',
+          action: 'approve',
+          description: 'Approve product publication',
+        },
+        {
+          code: 'products.reject',
+          name: 'Reject Products',
+          resource: 'products',
+          action: 'reject',
+          description: 'Reject product publication',
+        },
+        {
+          code: 'products.archive',
+          name: 'Archive Products',
+          resource: 'products',
+          action: 'archive',
+          description: 'Archive products',
+        },
+        {
+          code: 'product_media.manage',
+          name: 'Manage Product Media',
+          resource: 'product_media',
+          action: 'manage',
+          description: 'Upload and delete product media',
+        },
       ];
 
       for (const p of basePermissions) {
@@ -270,7 +382,14 @@ export class RbacSeederService implements OnModuleInit {
       // 1. CUSTOMER base permissions
       const customerRole = await this.rbacRepository.findRoleByCode(UserRole.CUSTOMER);
       if (customerRole) {
-        const customerPermCodes = ['profile.read', 'profile.update', 'addresses.manage'];
+        const customerPermCodes = [
+          'profile.read',
+          'profile.update',
+          'addresses.manage',
+          'categories.read',
+          'brands.read',
+          'products.read',
+        ];
         const customerPermIds = customerPermCodes
           .map((c) => permMap.get(c))
           .filter((id): id is string => Boolean(id));
@@ -288,6 +407,15 @@ export class RbacSeederService implements OnModuleInit {
           'seller.profile.update',
           'store.read',
           'store.update',
+          'categories.read',
+          'brands.read',
+          'products.read',
+          'products.create',
+          'products.update',
+          'products.delete',
+          'products.submit',
+          'products.archive',
+          'product_media.manage',
         ];
         const sellerPermIds = sellerPermCodes
           .map((c) => permMap.get(c))
@@ -304,6 +432,12 @@ export class RbacSeederService implements OnModuleInit {
           'seller.profile.read',
           'store.read',
           'store.update',
+          'categories.read',
+          'brands.read',
+          'products.read',
+          'products.create',
+          'products.update',
+          'product_media.manage',
         ];
         const staffPermIds = staffPermCodes
           .map((c) => permMap.get(c))
@@ -335,6 +469,22 @@ export class RbacSeederService implements OnModuleInit {
           'stores.suspend',
           'seller_documents.read',
           'seller_documents.review',
+          'categories.read',
+          'categories.create',
+          'categories.update',
+          'categories.delete',
+          'brands.read',
+          'brands.manage',
+          'products.read',
+          'products.create',
+          'products.update',
+          'products.delete',
+          'products.submit',
+          'products.review',
+          'products.approve',
+          'products.reject',
+          'products.archive',
+          'product_media.manage',
         ];
         const adminPermIds = adminPermCodes
           .map((c) => permMap.get(c))

@@ -15,7 +15,10 @@ export class CreateBrandDto {
   })
   slug?: string;
 
-  @ApiPropertyOptional({ example: 'https://cdn.example.com/chanel.png', description: 'Brand logo URL' })
+  @ApiPropertyOptional({
+    example: 'https://cdn.example.com/chanel.png',
+    description: 'Brand logo URL',
+  })
   @IsOptional()
   @IsString()
   logoUrl?: string;
