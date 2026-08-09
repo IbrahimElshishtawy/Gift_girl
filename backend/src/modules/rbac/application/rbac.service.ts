@@ -69,11 +69,7 @@ export class RbacService {
     });
   }
 
-  async updateCustomRole(
-    roleId: string,
-    name?: string,
-    description?: string,
-  ): Promise<RoleEntity> {
+  async updateCustomRole(roleId: string, name?: string, description?: string): Promise<RoleEntity> {
     const role = await this.rbacRepository.findRoleById(roleId);
     if (!role) {
       throw new NotFoundException('Role not found.');

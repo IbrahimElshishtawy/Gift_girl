@@ -45,10 +45,7 @@ export class RbacRepository {
     return RoleEntity.fromPrisma(role);
   }
 
-  async updateRole(
-    id: string,
-    data: { name?: string; description?: string },
-  ): Promise<RoleEntity> {
+  async updateRole(id: string, data: { name?: string; description?: string }): Promise<RoleEntity> {
     const updated = await this.prisma.role.update({
       where: { id },
       data,

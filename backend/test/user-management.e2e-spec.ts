@@ -25,17 +25,17 @@ describe('User Management & RBAC Module (e2e)', () => {
   let createdAddressId: string;
 
   // In-memory mocks
-  const mockUsers: Record<string, any>[] = [];
-  const mockSessions: Record<string, any>[] = [];
-  const mockProfiles: Record<string, any>[] = [];
-  const mockAddresses: Record<string, any>[] = [];
-  const mockPreferences: Record<string, any>[] = [];
-  const mockRoles: Record<string, any>[] = [
+  const mockUsers: Record<string, unknown>[] = [];
+  const mockSessions: Record<string, unknown>[] = [];
+  const mockProfiles: Record<string, unknown>[] = [];
+  const mockAddresses: Record<string, unknown>[] = [];
+  const mockPreferences: Record<string, unknown>[] = [];
+  const mockRoles: Record<string, unknown>[] = [
     { id: 'r_1', code: 'CUSTOMER', name: 'Customer', isSystem: true },
     { id: 'r_2', code: 'ADMIN', name: 'Admin', isSystem: true },
     { id: 'r_3', code: 'SUPER_ADMIN', name: 'Super Admin', isSystem: true },
   ];
-  const mockPermissions: Record<string, any>[] = [
+  const mockPermissions: Record<string, unknown>[] = [
     { id: 'p_1', code: 'users.read', resource: 'users', action: 'read' },
     { id: 'p_2', code: 'users.suspend', resource: 'users', action: 'suspend' },
     { id: 'p_3', code: 'users.assign_role', resource: 'users', action: 'assign_role' },
@@ -46,7 +46,7 @@ describe('User Management & RBAC Module (e2e)', () => {
     { id: 'p_8', code: 'profile.update', resource: 'profile', action: 'update' },
     { id: 'p_9', code: 'addresses.manage', resource: 'addresses', action: 'manage' },
   ];
-  const mockRolePermissions: Record<string, any>[] = [
+  const mockRolePermissions: Record<string, unknown>[] = [
     { roleId: 'r_2', permissionId: 'p_1' },
     { roleId: 'r_2', permissionId: 'p_2' },
     { roleId: 'r_2', permissionId: 'p_3' },
@@ -63,7 +63,7 @@ describe('User Management & RBAC Module (e2e)', () => {
     { roleId: 'r_1', permissionId: 'p_8' },
     { roleId: 'r_1', permissionId: 'p_9' },
   ];
-  const mockUserRoles: Record<string, any>[] = [];
+  const mockUserRoles: Record<string, unknown>[] = [];
   const mockRedisMap = new Map<string, string>();
 
   const mockNotificationProvider: INotificationProvider = {
