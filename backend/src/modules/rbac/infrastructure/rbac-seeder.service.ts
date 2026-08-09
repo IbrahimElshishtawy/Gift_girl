@@ -102,6 +102,111 @@ export class RbacSeederService implements OnModuleInit {
           action: 'manage',
           description: 'Create, update, delete own addresses',
         },
+        {
+          code: 'sellers.read',
+          name: 'Read Sellers',
+          resource: 'sellers',
+          action: 'read',
+          description: 'View seller profiles and list',
+        },
+        {
+          code: 'sellers.review',
+          name: 'Review Seller Applications',
+          resource: 'sellers',
+          action: 'review',
+          description: 'Review seller onboarding applications',
+        },
+        {
+          code: 'sellers.approve',
+          name: 'Approve Sellers',
+          resource: 'sellers',
+          action: 'approve',
+          description: 'Approve seller applications',
+        },
+        {
+          code: 'sellers.reject',
+          name: 'Reject Sellers',
+          resource: 'sellers',
+          action: 'reject',
+          description: 'Reject seller applications',
+        },
+        {
+          code: 'sellers.suspend',
+          name: 'Suspend Sellers',
+          resource: 'sellers',
+          action: 'suspend',
+          description: 'Suspend or activate sellers',
+        },
+        {
+          code: 'sellers.activate',
+          name: 'Activate Sellers',
+          resource: 'sellers',
+          action: 'activate',
+          description: 'Activate sellers',
+        },
+        {
+          code: 'stores.read',
+          name: 'Read Stores',
+          resource: 'stores',
+          action: 'read',
+          description: 'View store profiles and list',
+        },
+        {
+          code: 'stores.approve',
+          name: 'Approve Stores',
+          resource: 'stores',
+          action: 'approve',
+          description: 'Approve storefronts',
+        },
+        {
+          code: 'stores.suspend',
+          name: 'Suspend Stores',
+          resource: 'stores',
+          action: 'suspend',
+          description: 'Suspend storefronts',
+        },
+        {
+          code: 'seller_documents.read',
+          name: 'Read Seller Documents',
+          resource: 'seller_documents',
+          action: 'read',
+          description: 'View verification documents',
+        },
+        {
+          code: 'seller_documents.review',
+          name: 'Review Seller Documents',
+          resource: 'seller_documents',
+          action: 'review',
+          description: 'Approve or reject verification documents',
+        },
+        {
+          code: 'seller.profile.read',
+          name: 'Read Own Seller Profile',
+          resource: 'seller.profile',
+          action: 'read',
+          description: 'View own seller profile',
+        },
+        {
+          code: 'seller.profile.update',
+          name: 'Update Own Seller Profile',
+          resource: 'seller.profile',
+          action: 'update',
+          description: 'Update own seller profile',
+        },
+        {
+          code: 'store.read',
+          name: 'Read Own Store',
+          resource: 'store',
+          action: 'read',
+          description: 'View own store',
+        },
+        {
+          code: 'store.update',
+          name: 'Update Own Store',
+          resource: 'store',
+          action: 'update',
+          description: 'Update own store details',
+        },
       ];
 
       for (const p of basePermissions) {
@@ -172,7 +277,41 @@ export class RbacSeederService implements OnModuleInit {
         await this.rbacRepository.assignPermissionsToRole(customerRole.id, customerPermIds);
       }
 
-      // 2. ADMIN base permissions
+      // 2. SELLER base permissions
+      const sellerRole = await this.rbacRepository.findRoleByCode(UserRole.SELLER);
+      if (sellerRole) {
+        const sellerPermCodes = [
+          'profile.read',
+          'profile.update',
+          'addresses.manage',
+          'seller.profile.read',
+          'seller.profile.update',
+          'store.read',
+          'store.update',
+        ];
+        const sellerPermIds = sellerPermCodes
+          .map((c) => permMap.get(c))
+          .filter((id): id is string => Boolean(id));
+        await this.rbacRepository.assignPermissionsToRole(sellerRole.id, sellerPermIds);
+      }
+
+      // 3. SELLER_STAFF base permissions
+      const sellerStaffRole = await this.rbacRepository.findRoleByCode(UserRole.SELLER_STAFF);
+      if (sellerStaffRole) {
+        const staffPermCodes = [
+          'profile.read',
+          'profile.update',
+          'seller.profile.read',
+          'store.read',
+          'store.update',
+        ];
+        const staffPermIds = staffPermCodes
+          .map((c) => permMap.get(c))
+          .filter((id): id is string => Boolean(id));
+        await this.rbacRepository.assignPermissionsToRole(sellerStaffRole.id, staffPermIds);
+      }
+
+      // 4. ADMIN base permissions
       const adminRole = await this.rbacRepository.findRoleByCode(UserRole.ADMIN);
       if (adminRole) {
         const adminPermCodes = [
@@ -185,6 +324,17 @@ export class RbacSeederService implements OnModuleInit {
           'profile.read',
           'profile.update',
           'addresses.manage',
+          'sellers.read',
+          'sellers.review',
+          'sellers.approve',
+          'sellers.reject',
+          'sellers.suspend',
+          'sellers.activate',
+          'stores.read',
+          'stores.approve',
+          'stores.suspend',
+          'seller_documents.read',
+          'seller_documents.review',
         ];
         const adminPermIds = adminPermCodes
           .map((c) => permMap.get(c))
@@ -192,7 +342,7 @@ export class RbacSeederService implements OnModuleInit {
         await this.rbacRepository.assignPermissionsToRole(adminRole.id, adminPermIds);
       }
 
-      // 3. SUPER_ADMIN base permissions (All permissions)
+      // 5. SUPER_ADMIN base permissions (All permissions)
       const superAdminRole = await this.rbacRepository.findRoleByCode(UserRole.SUPER_ADMIN);
       if (superAdminRole) {
         const allIds = Array.from(permMap.values());
