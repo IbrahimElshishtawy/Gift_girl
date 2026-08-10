@@ -96,10 +96,9 @@ describe('Inventory + Stock Management Domain Module (e2e)', () => {
     $queryRaw: jest.fn().mockImplementation((query: any, ...args: any[]) => {
       const queryStr = String(query);
       if (queryStr.includes('FROM "inventories"')) {
-        const varId = args[0];
-        const id = args[0];
+        const targetVal = args[0];
         const found = mockInventories.find(
-          (inv: any) => inv.variantId === varId || inv.id === id || inv.variantId === args[0],
+          (inv: any) => inv.variantId === targetVal || inv.id === targetVal,
         );
         return Promise.resolve(found ? [found] : []);
       }
@@ -110,6 +109,40 @@ describe('Inventory + Stock Management Domain Module (e2e)', () => {
       }
       return Promise.resolve([]);
     }),
+    authSession: {
+      create: jest.fn().mockImplementation(({ data }) => {
+        const newSession = {
+          id: `sess_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          ...data,
+          isValid: true,
+          expiresAt: new Date(Date.now() + 86400000),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        mockSessions.push(newSession);
+        return Promise.resolve(newSession);
+      }),
+      findUnique: jest.fn().mockImplementation(({ where }) => {
+        const found = mockSessions.find(
+          (s: Record<string, unknown>) => s.id === where?.id || s.sessionToken === where?.sessionToken,
+        );
+        return Promise.resolve(found || null);
+      }),
+      findFirst: jest.fn().mockImplementation(({ where }) => {
+        const found = mockSessions.find(
+          (s: Record<string, unknown>) => s.id === where?.id || s.sessionToken === where?.sessionToken,
+        );
+        return Promise.resolve(found || null);
+      }),
+      update: jest.fn().mockImplementation(({ where, data }) => {
+        const idx = mockSessions.findIndex((s: Record<string, unknown>) => s.id === where.id);
+        if (idx !== -1) {
+          mockSessions[idx] = { ...mockSessions[idx], ...data, updatedAt: new Date() };
+          return Promise.resolve(mockSessions[idx]);
+        }
+        return Promise.resolve(null);
+      }),
+    },
     user: {
       create: jest.fn().mockImplementation(({ data }) => {
         const newUser = {
@@ -231,9 +264,34 @@ describe('Inventory + Stock Management Domain Module (e2e)', () => {
       }),
     },
     product: {
-      findUnique: jest.fn().mockImplementation(({ where }) => {
+      findUnique: jest.fn().mockImplementation(({ where, include }) => {
         const found = mockProducts.find((p: Record<string, unknown>) => p.id === where?.id);
-        return Promise.resolve(found || null);
+        if (!found) return Promise.resolve(null);
+        const res: Record<string, unknown> = { ...found };
+        if (include?.store) {
+          res.store = mockStores.find((st: any) => st.id === (found as any).storeId);
+        }
+        if (include?.category) {
+          res.category = mockCategories.find((cat: any) => cat.id === (found as any).categoryId);
+        }
+        return Promise.resolve(res);
+      }),
+      findFirst: jest.fn().mockImplementation(({ where }) => {
+        const found = mockProducts.find((p: Record<string, unknown>) => {
+          if (where?.slug && p.slug !== where.slug) return false;
+          if (where?.status && p.status !== where.status) return false;
+          return true;
+        });
+        if (!found) return Promise.resolve(null);
+        return Promise.resolve({
+          ...found,
+          category: mockCategories.find((c: any) => c.id === (found as any).categoryId),
+          brand: null,
+          options: [],
+          variants: mockVariants.filter((v: any) => v.productId === (found as any).id),
+          media: [],
+          attributes: [],
+        });
       }),
       findById: jest.fn().mockImplementation(({ id }) => {
         const found = mockProducts.find((p: Record<string, unknown>) => p.id === id);
@@ -272,7 +330,7 @@ describe('Inventory + Stock Management Domain Module (e2e)', () => {
       create: jest.fn().mockImplementation(({ data }) => {
         const newVariant = {
           id: `var_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-          ...data,
+          productId: data.productId,
           sku: data.sku,
           price: data.price || null,
           compareAtPrice: data.compareAtPrice || null,
@@ -297,6 +355,20 @@ describe('Inventory + Stock Management Domain Module (e2e)', () => {
             updatedAt: new Date(),
           };
           mockInventories.push(newInv);
+        } else {
+          // Automatic default inventory creation fallback
+          const newInv = {
+            id: `inv_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+            variantId: newVariant.id,
+            onHandQuantity: 0,
+            reservedQuantity: 0,
+            lowStockThreshold: 10,
+            version: 1,
+            status: 'OUT_OF_STOCK',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          mockInventories.push(newInv);
         }
 
         return Promise.resolve(newVariant);
@@ -304,8 +376,9 @@ describe('Inventory + Stock Management Domain Module (e2e)', () => {
     },
     inventory: {
       findUnique: jest.fn().mockImplementation(({ where, include }) => {
+        const targetVal = typeof where === 'string' ? where : where?.variantId || where?.id;
         const found = mockInventories.find(
-          (inv: Record<string, unknown>) => inv.variantId === where?.variantId || inv.id === where?.id,
+          (inv: Record<string, unknown>) => inv.variantId === targetVal || inv.id === targetVal,
         );
         if (!found) return Promise.resolve(null);
 
@@ -580,7 +653,9 @@ describe('Inventory + Stock Management Domain Module (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   // Setup Test Accounts
@@ -688,7 +763,7 @@ describe('Inventory + Stock Management Domain Module (e2e)', () => {
       .send({
         sku: variant1Sku,
         price: 599.99,
-        optionValueIds: [],
+        optionValueIds: ['opt_val_1'],
       })
       .expect(201);
 
@@ -771,11 +846,10 @@ describe('Inventory + Stock Management Domain Module (e2e)', () => {
 
   // 9: Out of stock detected (OUT_OF_STOCK)
   it('9. POST /api/sellers/me/inventory/:variantId/adjust - Out of stock status detected when stock drops to 0', async () => {
-    // Temporary variant for out of stock test
     const v2Res = await request(app.getHttpServer())
       .post(`/api/sellers/me/products/${product1Id}/variants`)
       .set('Authorization', `Bearer ${seller1Token}`)
-      .send({ sku: `OOS-SKU-${Date.now()}`, price: 100 })
+      .send({ sku: `OOS-SKU-${Date.now()}`, price: 100, optionValueIds: ['opt_val_oos'] })
       .expect(201);
 
     const inv = mockInventories.find((i: any) => i.variantId === v2Res.body.id);
