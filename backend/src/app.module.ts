@@ -11,6 +11,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { RbacModule } from './modules/rbac/rbac.module';
 import { SellersModule } from './modules/sellers/sellers.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CatalogModule } from './modules/catalog/catalog.module';
     AuthModule,
     SellersModule,
     CatalogModule,
+    InventoryModule,
   ],
 })
 export class AppModule implements NestModule {

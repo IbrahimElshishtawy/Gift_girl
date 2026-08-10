@@ -79,6 +79,14 @@ export class ProductVariantsRepository {
             optionValue: { connect: { id } },
           })),
         },
+        inventory: {
+          create: {
+            onHandQuantity: 0,
+            reservedQuantity: 0,
+            lowStockThreshold: 10,
+            status: 'OUT_OF_STOCK',
+          },
+        },
       },
       include: {
         optionValues: {
