@@ -361,6 +361,34 @@ export class RbacSeederService implements OnModuleInit {
           action: 'manage',
           description: 'Create, release, consume, and expire reservations',
         },
+        {
+          code: 'cart.read',
+          name: 'Read Cart',
+          resource: 'cart',
+          action: 'read',
+          description: 'Read own shopping cart',
+        },
+        {
+          code: 'cart.manage',
+          name: 'Manage Cart',
+          resource: 'cart',
+          action: 'manage',
+          description: 'Manage cart items and validation',
+        },
+        {
+          code: 'wishlist.read',
+          name: 'Read Wishlist',
+          resource: 'wishlist',
+          action: 'read',
+          description: 'Read own wishlist',
+        },
+        {
+          code: 'wishlist.manage',
+          name: 'Manage Wishlist',
+          resource: 'wishlist',
+          action: 'manage',
+          description: 'Manage wishlist items',
+        },
       ];
 
       for (const p of basePermissions) {
@@ -431,6 +459,10 @@ export class RbacSeederService implements OnModuleInit {
           'categories.read',
           'brands.read',
           'products.read',
+          'cart.read',
+          'cart.manage',
+          'wishlist.read',
+          'wishlist.manage',
         ];
         const customerPermIds = customerPermCodes
           .map((c) => permMap.get(c))

@@ -110,6 +110,11 @@ enum SecurityEventType {
   INVENTORY_STOCK_OUT
   INVENTORY_LOW_STOCK
   INVENTORY_SETTINGS_UPDATED
+  CART_CREATED
+  CART_MERGED
+  CART_CLEARED
+  WISHLIST_ITEM_ADDED
+  WISHLIST_ITEM_REMOVED
 }
 
 enum SellerStatus {
@@ -191,6 +196,8 @@ model User {
   seller              Seller?
   sellerApplications  SellerApplication[]
   staffRoles          SellerStaff[]
+  carts               Cart[]
+  wishlist            Wishlist?
 
   @@index([email])
   @@index([phone])
@@ -660,6 +667,8 @@ model ProductVariant {
 
   optionValues           ProductVariantOptionValue[]
   inventory              Inventory?
+  cartItems              CartItem[]
+  wishlistItems          WishlistItem[]
 
   @@unique([productId, optionCombinationHash])
   @@index([productId])
@@ -803,3 +812,78 @@ model InventoryReservation {
   @@index([idempotencyKey])
   @@map("inventory_reservations")
 }
+
+enum CartStatus {
+  ACTIVE
+  MERGED
+  CONVERTED
+  ABANDONED
+  EXPIRED
+}
+
+model Cart {
+  id             String      @id @default(uuid())
+  userId         String?
+  user           User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestTokenHash String?     @unique
+  status         CartStatus  @default(ACTIVE)
+  currency       String      @default("EGP")
+  expiresAt      DateTime
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  items          CartItem[]
+
+  @@index([userId])
+  @@index([guestTokenHash])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("carts")
+}
+
+model CartItem {
+  id                String         @id @default(uuid())
+  cartId            String
+  cart              Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId         String
+  variant           ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity          Int
+  unitPriceSnapshot Decimal        @db.Decimal(10, 2)
+  currency          String         @default("EGP")
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@unique([cartId, variantId])
+  @@index([cartId])
+  @@index([variantId])
+  @@map("cart_items")
+}
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   @default("My Wishlist")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items     WishlistItem[]
+
+  @@index([userId])
+  @@map("wishlists")
+}
+
+model WishlistItem {
+  id         String         @id @default(uuid())
+  wishlistId String
+  wishlist   Wishlist       @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  variantId  String
+  variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  createdAt  DateTime       @default(now())
+
+  @@unique([wishlistId, variantId])
+  @@index([wishlistId])
+  @@index([variantId])
+  @@map("wishlist_items")
+}
+
