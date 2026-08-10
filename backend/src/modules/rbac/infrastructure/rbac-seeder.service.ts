@@ -319,6 +319,48 @@ export class RbacSeederService implements OnModuleInit {
           action: 'manage',
           description: 'Upload and delete product media',
         },
+        {
+          code: 'inventory.read',
+          name: 'Read Inventory',
+          resource: 'inventory',
+          action: 'read',
+          description: 'View inventory levels and status',
+        },
+        {
+          code: 'inventory.adjust',
+          name: 'Adjust Inventory',
+          resource: 'inventory',
+          action: 'adjust',
+          description: 'Adjust stock levels',
+        },
+        {
+          code: 'inventory.manage',
+          name: 'Manage Inventory',
+          resource: 'inventory',
+          action: 'manage',
+          description: 'Manage inventory settings and thresholds',
+        },
+        {
+          code: 'inventory.movements.read',
+          name: 'Read Inventory Movements',
+          resource: 'inventory_movements',
+          action: 'read',
+          description: 'View inventory movement history ledger',
+        },
+        {
+          code: 'inventory.reservations.read',
+          name: 'Read Inventory Reservations',
+          resource: 'inventory_reservations',
+          action: 'read',
+          description: 'View stock reservations',
+        },
+        {
+          code: 'inventory.reservations.manage',
+          name: 'Manage Inventory Reservations',
+          resource: 'inventory_reservations',
+          action: 'manage',
+          description: 'Create, release, consume, and expire reservations',
+        },
       ];
 
       for (const p of basePermissions) {
@@ -416,6 +458,12 @@ export class RbacSeederService implements OnModuleInit {
           'products.submit',
           'products.archive',
           'product_media.manage',
+          'inventory.read',
+          'inventory.adjust',
+          'inventory.manage',
+          'inventory.movements.read',
+          'inventory.reservations.read',
+          'inventory.reservations.manage',
         ];
         const sellerPermIds = sellerPermCodes
           .map((c) => permMap.get(c))
@@ -438,6 +486,9 @@ export class RbacSeederService implements OnModuleInit {
           'products.create',
           'products.update',
           'product_media.manage',
+          'inventory.read',
+          'inventory.movements.read',
+          'inventory.reservations.read',
         ];
         const staffPermIds = staffPermCodes
           .map((c) => permMap.get(c))
@@ -485,6 +536,12 @@ export class RbacSeederService implements OnModuleInit {
           'products.reject',
           'products.archive',
           'product_media.manage',
+          'inventory.read',
+          'inventory.adjust',
+          'inventory.manage',
+          'inventory.movements.read',
+          'inventory.reservations.read',
+          'inventory.reservations.manage',
         ];
         const adminPermIds = adminPermCodes
           .map((c) => permMap.get(c))

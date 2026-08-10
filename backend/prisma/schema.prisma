@@ -101,6 +101,15 @@ enum SecurityEventType {
   PRODUCT_MEDIA_ADDED
   PRODUCT_MEDIA_UPDATED
   PRODUCT_MEDIA_DELETED
+  INVENTORY_INITIALIZED
+  INVENTORY_ADJUSTED
+  INVENTORY_RESERVATION_CREATED
+  INVENTORY_RESERVATION_RELEASED
+  INVENTORY_RESERVATION_EXPIRED
+  INVENTORY_RESERVATION_CONSUMED
+  INVENTORY_STOCK_OUT
+  INVENTORY_LOW_STOCK
+  INVENTORY_SETTINGS_UPDATED
 }
 
 enum SellerStatus {
@@ -650,6 +659,7 @@ model ProductVariant {
   updatedAt              DateTime                    @updatedAt
 
   optionValues           ProductVariantOptionValue[]
+  inventory              Inventory?
 
   @@unique([productId, optionCombinationHash])
   @@index([productId])
@@ -698,4 +708,98 @@ model ProductMedia {
 
   @@index([productId])
   @@map("product_media")
+}
+
+enum InventoryStatus {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+  DISABLED
+}
+
+enum InventoryMovementType {
+  INITIAL_STOCK
+  STOCK_IN
+  STOCK_OUT
+  ADJUSTMENT
+  RESERVATION
+  RELEASE
+  SALE
+  RETURN
+  DAMAGE
+  LOSS
+  MANUAL_CORRECTION
+}
+
+enum ReservationStatus {
+  ACTIVE
+  RELEASED
+  EXPIRED
+  CONSUMED
+  CANCELLED
+}
+
+model Inventory {
+  id                String          @id @default(uuid())
+  variantId         String          @unique
+  variant           ProductVariant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  onHandQuantity    Int             @default(0)
+  reservedQuantity  Int             @default(0)
+  lowStockThreshold Int             @default(10)
+  version           Int             @default(1)
+  status            InventoryStatus @default(OUT_OF_STOCK)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  movements         InventoryMovement[]
+  reservations      InventoryReservation[]
+
+  @@index([status])
+  @@index([variantId])
+  @@map("inventories")
+}
+
+model InventoryMovement {
+  id             String                @id @default(uuid())
+  inventoryId    String
+  inventory      Inventory             @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  type           InventoryMovementType
+  quantity       Int
+  beforeQuantity Int
+  afterQuantity  Int
+  reason         String?
+  referenceType  String?
+  referenceId    String?
+  idempotencyKey String?               @unique
+  performedBy    String?
+  createdAt      DateTime              @default(now())
+
+  @@index([inventoryId])
+  @@index([createdAt])
+  @@index([type])
+  @@index([idempotencyKey])
+  @@map("inventory_movements")
+}
+
+model InventoryReservation {
+  id             String            @id @default(uuid())
+  inventoryId    String
+  inventory      Inventory         @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  quantity       Int
+  status         ReservationStatus @default(ACTIVE)
+  expiresAt      DateTime
+  referenceType  String?
+  referenceId    String?
+  idempotencyKey String?           @unique
+  createdBy      String?
+  releasedAt     DateTime?
+  consumedAt     DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([inventoryId])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([idempotencyKey])
+  @@map("inventory_reservations")
 }

@@ -244,7 +244,7 @@ describe('Catalog + Categories + Products Domain Module (e2e)', () => {
       findMany: jest.fn().mockImplementation(({ where }) => {
         let filtered = [...mockCategories];
         if (where?.parentId !== undefined) {
-          filtered = filtered.filter((c: any) => c.parentId === where.parentId);
+          filtered = filtered.filter((c: any) => (c.parentId || null) === where.parentId);
         }
         if (where?.status) {
           filtered = filtered.filter((c: any) => c.status === where.status);
@@ -256,6 +256,7 @@ describe('Catalog + Categories + Products Domain Module (e2e)', () => {
         const newCat = {
           id: `cat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
           ...data,
+          parentId: data.parentId || null,
           status: data.status || 'ACTIVE',
           isActive: data.isActive !== undefined ? data.isActive : true,
           sortOrder: data.sortOrder || 0,
@@ -660,7 +661,6 @@ describe('Catalog + Categories + Products Domain Module (e2e)', () => {
     const adminRes = await request(app.getHttpServer())
       .post('/api/auth/register')
       .send({ email: adminEmail, password: testPassword });
-    console.log('DEBUG setup adminRes status:', adminRes.status, 'body:', adminRes.body);
     expect(adminRes.status).toBe(201);
     adminToken = adminRes.body.tokens.accessToken;
 
@@ -673,7 +673,6 @@ describe('Catalog + Categories + Products Domain Module (e2e)', () => {
     const s1Res = await request(app.getHttpServer())
       .post('/api/auth/register')
       .send({ email: seller1Email, password: testPassword });
-    console.log('DEBUG setup s1Res status:', s1Res.status, 'body:', s1Res.body);
     expect(s1Res.status).toBe(201);
     seller1Token = s1Res.body.tokens.accessToken;
     const seller1User: any = mockUsers.find((u: any) => u.email === seller1Email);
