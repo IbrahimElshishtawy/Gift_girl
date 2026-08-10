@@ -71,6 +71,7 @@ export class SellerProductsController {
   }
 
   @Post(':id/submit')
+  @HttpCode(HttpStatus.OK)
   @Permissions('products.submit')
   @ApiOperation({ summary: 'Submit product for admin review (PENDING_REVIEW)' })
   @ApiResponse({ status: 200, description: 'Product submitted for review.' })
@@ -79,6 +80,7 @@ export class SellerProductsController {
   }
 
   @Post(':id/archive')
+  @HttpCode(HttpStatus.OK)
   @Permissions('products.archive')
   @ApiOperation({ summary: 'Archive product' })
   @ApiResponse({ status: 200, description: 'Product archived.' })

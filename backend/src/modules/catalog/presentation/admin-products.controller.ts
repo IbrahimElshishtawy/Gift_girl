@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -58,6 +58,7 @@ export class AdminProductsController {
   }
 
   @Post(':id/approve')
+  @HttpCode(HttpStatus.OK)
   @Permissions('products.approve')
   @ApiOperation({ summary: 'Approve product for publication' })
   @ApiResponse({ status: 200, description: 'Product approved.' })
@@ -76,6 +77,7 @@ export class AdminProductsController {
   }
 
   @Post(':id/reject')
+  @HttpCode(HttpStatus.OK)
   @Permissions('products.reject')
   @ApiOperation({ summary: 'Reject product application' })
   @ApiResponse({ status: 200, description: 'Product rejected.' })
@@ -94,6 +96,7 @@ export class AdminProductsController {
   }
 
   @Post(':id/archive')
+  @HttpCode(HttpStatus.OK)
   @Permissions('products.archive')
   @ApiOperation({ summary: 'Archive product' })
   @ApiResponse({ status: 200, description: 'Product archived.' })

@@ -257,6 +257,7 @@ describe('Catalog + Categories + Products Domain Module (e2e)', () => {
           id: `cat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
           ...data,
           status: data.status || 'ACTIVE',
+          isActive: data.isActive !== undefined ? data.isActive : true,
           sortOrder: data.sortOrder || 0,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -547,10 +548,18 @@ describe('Catalog + Categories + Products Domain Module (e2e)', () => {
     },
     permission: {
       findUnique: jest.fn().mockImplementation(({ where }) => {
-        const found = mockPermissions.find((p: Record<string, unknown>) => p.code === where.code);
+        const found = mockPermissions.find(
+          (p: Record<string, unknown>) => p.code === where.code || p.id === where.id,
+        );
         return Promise.resolve(found || null);
       }),
       findMany: jest.fn().mockImplementation(() => Promise.resolve(mockPermissions)),
+      create: jest.fn().mockImplementation(({ data }) => Promise.resolve({ id: `p_${Date.now()}`, ...data })),
+      upsert: jest.fn().mockImplementation(({ create }) => Promise.resolve({ id: `p_${Date.now()}`, ...create })),
+    },
+    verificationToken: {
+      create: jest.fn().mockResolvedValue({ id: 'v_1' }),
+      findFirst: jest.fn().mockResolvedValue(null),
     },
     rolePermission: {
       deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
